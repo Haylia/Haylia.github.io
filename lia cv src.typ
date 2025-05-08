@@ -53,6 +53,10 @@
 - Second Class Honours
 - Dissertation titled: "Understanding and using EEG Readings from the Visual Cortex to Control a Computer"
 
+== Programming
+- * Experienced Programming Languages*: Python, C\# in Unity, C\# in .NET, Java, MySQL
+- * Basic Knowledge Programming Languages*: Haskell, JavaScript, HTML/CSS
+
 == Projects and  Experience
 
 #project(
@@ -145,27 +149,25 @@
 //   date: "Oct 2024",
 // )
 
-== Programming
-- * Experienced Programming Languages*: Python, C\# in Unity, C\# in .NET, Java, MySQL
-- * Basic Knowledge Programming Languages*: Haskell, JavaScript, HTML/CSS
 
-== Interests and Misc
 
-#certificates(
-  name: "Tennis, Table Tennis, Skiing",
-  issuer: "Casual racket sports player, enjoyer of ski holiday",
-)
+== Miscellaneous
 
-#certificates(
-  name: "Social board and trading card games",
-  issuer: "Casual Magic: The Gathering Commander player"
-)
-
-#certificates(
-  name: "Esports",
-  issuer: "Team player and captain for University of Southampton Overwatch Teams",
-  date: dates-helper(start-date: "Oct 2020", end-date: "May 2024")
-)
+// #certificates(
+//   name: "Tennis, Table Tennis, Skiing",
+//   issuer: "Casual racket sports player, enjoyer of ski holiday",
+// )
+// 
+// #certificates(
+//   name: "Social board and trading card games",
+//   issuer: "Casual Magic: The Gathering Commander player"
+// )
+// 
+// #certificates(
+//   name: "Esports",
+//   issuer: "Team player and captain for University of Southampton Overwatch Teams",
+//   date: dates-helper(start-date: "Oct 2020", end-date: "May 2024")
+// )
 
 
 - Full clean UK Driving License
