@@ -75,17 +75,7 @@
   dates: dates-helper(start-date: "Sept 2024", end-date: "July 2025"),
 )
 - Till assistant, donations assistant and general volunteer at Julia’s House locations in Broadstone and Creekmoor. 
-- Duties include assisting customers, replenishing and organising stock, receiving and sorting donations, steaming clothes, scanning books into the computer and general housekeeping.
-
-#work(
-  title: "Games Society Committee Member",
-  location: "Southampton, UK",
-  company: "University of Soutampton",
-  dates: dates-helper(start-date: "May 2021", end-date: "Jan 2022"),
-)
-- Represented the Overwatch scene within the Southampton Video Games and Esports society.
-- Created and managed Esports teams, hosted events within the scene and encouraged participation for the scene.
-
+- Duties included assisting customers, replenishing and organising stock, receiving and sorting donations, scanning books into the computer and general housekeeping.
 == Projects and  Experience
 
 #project(
@@ -110,17 +100,6 @@
 )
 - Replicated widely used but stopping service.
 - Created in short time frame, later refined for user-friendliness, smooth onboarding, and continuation of service.
-#project(
-  name: "CH Leaderboard",
-  // Role is optional
-  //role: "Developer and Maintainer",
-  // Dates is optional
-  dates: dates-helper(start-date: "July 2023", end-date: "June 2024"),
-  // URL is also optional
-  // url: "hyperschedule.io",
-)
-- Live packet capture to record combat events
-- Raid statistics compiled and displayed on Google Sheets via service account
 
 #project(
   name: "CH Tracker Bot",
@@ -133,6 +112,19 @@
 )
 - Discord frontend for user input and commands.
 - Google Sheets backend for data preservation and transparency.
+
+#project(
+  name: "CH Leaderboard",
+  // Role is optional
+  //role: "Developer and Maintainer",
+  // Dates is optional
+  dates: dates-helper(start-date: "July 2023", end-date: "June 2024"),
+  // URL is also optional
+  // url: "hyperschedule.io",
+)
+- Live packet capture to record combat events
+- Raid statistics compiled and displayed on Google Sheets via service account
+
 
 #project(
   name: "Marvel Rivals Bot",
@@ -185,9 +177,8 @@
 
 #certificates(
   name: "Esports",
-  issuer: "Team player and captain for University of Southampton Overwatch Teams",
+  issuer: "Team captain and player for University of Southampton Overwatch Teams",
   date: dates-helper(start-date: "Oct 2020", end-date: "May 2024")
 )
 
-- Full clean UK Driving License
-- Right to work in UK
+Full clean UK Driving License, Right to work in UK
