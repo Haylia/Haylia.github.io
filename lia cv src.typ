@@ -65,7 +65,7 @@
 - Reviewing and responding to KYC requests in a fast paced environment for many clients at a time.
 - Assisted with training new team members and handling clients with minimal supervision.
 - Organised and created internal tracking documents and programs to assist with team performance and assessment.
-- Early adapter of AI-backed workflow tool.
+- Early adopter of AI-backed workflow tool.
 
 
 #work(
