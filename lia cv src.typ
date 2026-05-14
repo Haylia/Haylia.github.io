@@ -2,7 +2,7 @@
 
 // Put your personal information here, replacing mine
 #let name = "Lia Jeffries"
-#let location = "Dorset, UK"
+#let location = "Chessington, UK"
 #let email = "liavjeffries@gmail.com"
 #let github = "github.com/haylia"
 #let linkedin = "linkedin.com/in/liavjeffries"
@@ -40,6 +40,7 @@
 * #generic-two-by-two(top-left: "", top-right: "", bottom-left: "", bottom-right: "")
 * #generic-one-by-two(left: "", right: "")
 */
+
 == Education
 #edu(
   institution: "University of Southampton",
@@ -53,9 +54,36 @@
 - Second Class Honours
 - Dissertation titled: "Understanding and using EEG Readings from the Visual Cortex to Control a Computer"
 
-== Programming
-- * Experienced Programming Languages*: Python, C\# in Unity, C\# in .NET, Java, MySQL
-- * Basic Knowledge Programming Languages*: Haskell, JavaScript, HTML/CSS
+== Professional Experience
+
+#work(
+  title: "Inbound KYC Analyst",
+  location: "London, UK",
+  company: "Carta Law (Previously Avantia Law)",
+  dates: dates-helper(start-date: "July 2025", end-date: "Present"),
+)
+- Reviewing and responding to KYC requests in a fast paced environment for many clients at a time
+- Organised and created internal tracking documents and programs to assist with team performance and assessment
+- Early adapter of AI-backed workflow tool
+
+
+#work(
+  title: "Julia's House Official Volunteer",
+  location: "Dorset, UK",
+  company: "Julia's House",
+  dates: dates-helper(start-date: "Sept 2024", end-date: "July 2025"),
+)
+- Till assistant, donations assistant and general volunteer at Julia’s House locations in Broadstone and Creekmoor. 
+- Duties include assisting customers, replenishing and organising stock, receiving and sorting donations, steaming clothes, scanning books into the computer and general housekeeping.
+
+#work(
+  title: "Games Society Committee Member",
+  location: "Southampton, UK",
+  company: "University of Soutampton",
+  dates: dates-helper(start-date: "May 2021", end-date: "Jan 2022"),
+)
+- Represented the Overwatch scene within the Southampton Video Games and Esports society.
+- Created and managed Esports teams, hosted events within the scene and encouraged participation for the scene.
 
 == Projects and  Experience
 
@@ -68,8 +96,8 @@
   // URL is also optional
   // url: "hyperschedule.io",
 )
-- Mod development for a mobile MMO
-- Live service elements and content generation
+- Development for a new App Store game
+- Live service elements, content generation, webpage design, feature programming
 #project(
   name: "CH Timer Bot",
   // Role is optional
@@ -79,8 +107,8 @@
   // URL is also optional
   // url: "hyperschedule.io",
 )
-- Replicated widely used but stopping service
-- Created in short time frame, later refined for user-friendliness and smooth on-boarding.
+- Replicated widely used but stopping service.
+- Created in short time frame, later refined for user-friendliness, smooth onboarding, and continuation of service.
 #project(
   name: "CH Leaderboard",
   // Role is optional
@@ -92,12 +120,25 @@
 )
 - Live packet capture to record combat events
 - Raid statistics compiled and displayed on Google Sheets via service account
+
+#project(
+  name: "CH Tracker Bot",
+  // Role is optional
+  //role: "Developer and Maintainer",
+  // Dates is optional
+  dates: dates-helper(start-date: "July 2023", end-date: "Present"),
+  // URL is also optional
+  // url: "hyperschedule.io",
+)
+- Discord frontend for user input and commands.
+- Google Sheets backend for data preservation and transparency.
+
 #project(
   name: "Marvel Rivals Bot",
   // Role is optional
   //role: "Developer and Maintainer",
   // Dates is optional
-  dates: dates-helper(start-date: "Feb 2025", end-date: "Present"),
+  dates: dates-helper(start-date: "Feb 2025", end-date: "September 2025"),
   // URL is also optional
   // url: "hyperschedule.io",
 )
@@ -115,25 +156,6 @@
 - University final year group project
 - Use of cloud computing services to create a Jackbox-style game with integrated AI
 
-== Volunteering
-
-#work(
-  title: "Julia's House Official Volunteer",
-  location: "Dorset, UK",
-  company: "Julia's House",
-  dates: dates-helper(start-date: "Sept 2024", end-date: "Present"),
-)
-- Till assistant, donations assistant and general volunteer at Julia’s House locations in Broadstone and Creekmoor. 
-- Duties include assisting customers, replenishing and organising stock, receiving and sorting donations, steaming clothes, scanning books into the computer system and general housekeeping.
-
-#work(
-  title: "Games Society Committee Member",
-  location: "Southampton, UK",
-  company: "University of Soutampton",
-  dates: dates-helper(start-date: "May 2021", end-date: "Jan 2022"),
-)
-- I represented the Overwatch scene within the Southampton Video Games and Esports society.
-- I created and managed Esports teams, hosted events within the scene and encouraged participation for the scene.
 
 
 // #extracurriculars(
@@ -149,26 +171,22 @@
 //   date: "Oct 2024",
 // )
 
+== Programming
+- * Experienced Programming Languages*: Python, C\# in Unity, C\# in .NET, Java, MySQL
+- * Basic Knowledge Programming Languages*: Haskell, JavaScript, HTML/CSS, Go
 
+== Interests and Misc
 
-== Miscellaneous
+#certificates(
+  name: "Tennis, Table Tennis, Skiing",
+  issuer: "Casual racket sports player, skier and runner",
+)
 
-// #certificates(
-//   name: "Tennis, Table Tennis, Skiing",
-//   issuer: "Casual racket sports player, enjoyer of ski holiday",
-// )
-// 
-// #certificates(
-//   name: "Social board and trading card games",
-//   issuer: "Casual Magic: The Gathering Commander player"
-// )
-// 
-// #certificates(
-//   name: "Esports",
-//   issuer: "Team player and captain for University of Southampton Overwatch Teams",
-//   date: dates-helper(start-date: "Oct 2020", end-date: "May 2024")
-// )
-
+#certificates(
+  name: "Esports",
+  issuer: "Team player and captain for University of Southampton Overwatch Teams",
+  date: dates-helper(start-date: "Oct 2020", end-date: "May 2024")
+)
 
 - Full clean UK Driving License
 - Right to work in UK
