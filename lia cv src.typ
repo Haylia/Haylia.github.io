@@ -2,11 +2,10 @@
 
 // Put your personal information here, replacing mine
 #let name = "Lia Jeffries"
-#let location = "Dorset, UK"
+#let location = "Chessington, UK"
 #let email = "liavjeffries@gmail.com"
 #let github = "github.com/haylia"
 #let linkedin = "linkedin.com/in/liavjeffries"
-#let phone = "[redacted]"
 #let personal-site = "haylia.github.io"
 
 #show: resume.with(

@@ -1,45 +1,210 @@
-<!--html comment-->
-<html>
-    <head>
-        <title>Lia's Page</title>
-        <link rel="stylesheet" type="text/css" href="style.css">
-        <meta charset = "UTF-8">
-    </head>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Projects — Lia Jeffries</title>
+  <meta name="description" content="Projects by Lia Jeffries — game development, Discord bots, real-time data tools, OCR and AI-integrated apps.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
 
-    <div class="hamburger-menu">
-        <input id="menu__toggle" type="checkbox" />
-        <label class="menu__btn" for="menu__toggle">
-          <span></span>
-        </label>
-    
-        <ul class="menu__box">
-          <li><a class="menu__item" href="https://haylia.github.io/">Home</a></li>
-          <li><a class="menu__item" href="https://haylia.github.io/about.html">About</a></li>
-          <li><a class="menu__item" href="https://haylia.github.io/contact.html">Contact</a></li>
-          <li><a class="menu__item" href="https://haylia.github.io/projects.html">Projects</a></li>
-          <!--
-          <li><a class="menu__item" href="https://haylia.github.io/emerald.html">Golira</a></li>
-          -->
-        </ul>
+  <nav class="nav">
+    <div class="container nav__inner">
+      <a class="nav__brand" href="index.html">Lia&nbsp;Jeffries</a>
+      <input class="nav__toggle" type="checkbox" id="navToggle" aria-label="Open menu">
+      <label class="nav__toggle-label" for="navToggle"><span></span><span></span><span></span></label>
+      <ul class="nav__links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="projects.html" aria-current="page">Projects</a></li>
+        <li><a href="about.html">About</a></li>
+        <li><a href="contact.html">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <header class="hero" style="padding-bottom:24px">
+    <div class="container">
+      <p class="hero__eyebrow">Projects</p>
+      <h1>Things I've built</h1>
+      <p class="hero__lead">
+        A mix of self-directed and team projects — from a full client–server mobile MMORPG to
+        Discord bots, real-time packet tooling and AI-integrated apps. Public repos are linked.
+      </p>
+    </div>
+  </header>
+
+  <main>
+    <section class="section" style="padding-top:16px">
+      <div class="container">
+        <div class="grid">
+
+          <article class="card">
+            <div class="card__head">
+              <h3>Wardens</h3>
+              <span class="card__meta">2023 — Present</span>
+            </div>
+            <p>Team development of a client–server mobile MMORPG (Unity / C#, MySQL). Built boss
+              mechanics, new gameplay features and bespoke content-creation tools (custom Unity
+              Editor tooling), plus in-game Discord integration. Now in mobile beta with ~1,000
+              registered testers (peaks of ~100 concurrent).</p>
+            <div class="card__tags">
+              <span class="chip">Unity</span><span class="chip">C#</span><span class="chip">MySQL</span><span class="chip">Game Dev</span>
+            </div>
+            <div class="card__links"><span class="badge badge--muted">Private — team project</span></div>
+          </article>
+
+          <article class="card">
+            <div class="card__head">
+              <h3>Scrawl</h3>
+              <span class="badge">In development</span>
+            </div>
+            <p>An Android party game built around creating, storing and reusing your own
+              draw-and-pass prompt decks, synced via Firebase / Firestore. Default decks come from an
+              AI-assisted content pipeline (Claude API). Tested, offline-first core.</p>
+            <div class="card__tags">
+              <span class="chip">Kotlin</span><span class="chip">Jetpack Compose</span><span class="chip">Firebase</span><span class="chip">Claude API</span>
+            </div>
+          </article>
+
+          <article class="card">
+            <div class="card__head">
+              <h3>Preferans Scorer</h3>
+              <span class="card__meta">Personal</span>
+            </div>
+            <p>An Android app that keeps score for Preferans, the trick-taking card game known for
+              its intricate scoring (bullet, mountain, whists and variants) — implemented as a
+              tested Kotlin domain model with a Jetpack Compose UI.</p>
+            <div class="card__tags">
+              <span class="chip">Kotlin</span><span class="chip">Jetpack Compose</span><span class="chip">Material 3</span><span class="chip">Android</span>
+            </div>
+          </article>
+
+          <article class="card">
+            <div class="card__head">
+              <h3>Live Combat Parser &amp; Leaderboard</h3>
+              <span class="card__meta">2023 — 2024</span>
+            </div>
+            <p>A raw-socket sniffer that reverse-engineers an MMORPG's network protocol to parse
+              live combat events in real time, then compiles raid damage leaderboards and syncs them
+              to Google Sheets via a service account.</p>
+            <div class="card__tags">
+              <span class="chip">Python</span><span class="chip">Networking</span><span class="chip">Reverse Engineering</span><span class="chip">Google Sheets API</span>
+            </div>
+            <div class="card__links"><span class="badge badge--muted">Private</span></div>
+          </article>
+
+          <article class="card">
+            <div class="card__head">
+              <h3>Raid Points Tracker Bot</h3>
+              <span class="card__meta">2023 — Present</span>
+            </div>
+            <p>A Discord-command frontend with a Google Sheets backend for transparent raid
+              loot-point (DKP) tracking in an MMORPG. Uses threading and tasks for concurrent
+              multi-account Sheets access, keeping commands responsive.</p>
+            <div class="card__tags">
+              <span class="chip">Python</span><span class="chip">discord.py</span><span class="chip">Threading</span><span class="chip">Google Sheets API</span>
+            </div>
+            <div class="card__links">
+              <a href="https://github.com/Haylia/Gwydion-DKP-bot" target="_blank" rel="noopener">GitHub →</a>
+            </div>
+          </article>
+
+          <article class="card">
+            <div class="card__head">
+              <h3>Marvel Rivals Bot</h3>
+              <span class="card__meta">2025</span>
+            </div>
+            <p>A Discord bot that tracked player stats and leaderboards for the hero shooter Marvel
+              Rivals. Scraped live match data with headless Selenium / Chrome and cached player IDs
+              to speed up lookups.</p>
+            <div class="card__tags">
+              <span class="chip">Python</span><span class="chip">discord.py</span><span class="chip">Selenium</span>
+            </div>
+            <div class="card__links">
+              <a href="https://github.com/Haylia/MarvelBot" target="_blank" rel="noopener">GitHub →</a>
+            </div>
+          </article>
+
+          <article class="card">
+            <div class="card__head">
+              <h3>MMO Timer Bot</h3>
+              <span class="card__meta">2024 — Present</span>
+            </div>
+            <p>A Discord bot providing multi-server boss and event timers for an MMORPG community.
+              Built to replace a popular service that was being discontinued, then refined for smooth
+              onboarding and reliable uptime.</p>
+            <div class="card__tags">
+              <span class="chip">Python</span><span class="chip">discord.py</span>
+            </div>
+            <div class="card__links">
+              <a href="https://github.com/Haylia/chtimerbot" target="_blank" rel="noopener">GitHub →</a>
+            </div>
+          </article>
+
+          <article class="card">
+            <div class="card__head">
+              <h3>Instagram Media Bot</h3>
+              <span class="card__meta">Personal</span>
+            </div>
+            <p>A Discord bot that fetches and embeds Instagram posts and other media on demand,
+              wrapping tools like instaloader, gallery-dl and yt-dlp behind simple commands.</p>
+            <div class="card__tags">
+              <span class="chip">Python</span><span class="chip">discord.py</span><span class="chip">instaloader</span><span class="chip">yt-dlp</span>
+            </div>
+            <div class="card__links">
+              <a href="https://github.com/Haylia/instabot" target="_blank" rel="noopener">GitHub →</a>
+            </div>
+          </article>
+
+          <article class="card">
+            <div class="card__head">
+              <h3>Quote Bot</h3>
+              <span class="card__meta">2024 — Present</span>
+            </div>
+            <p>A live, hosted Discord bot for saving and recalling memorable quotes on command —
+              installable to any server.</p>
+            <div class="card__tags">
+              <span class="chip">Python</span><span class="chip">discord.py</span>
+            </div>
+            <div class="card__links">
+              <a href="https://github.com/Haylia/quotebot" target="_blank" rel="noopener">GitHub →</a>
+            </div>
+          </article>
+
+          <article class="card">
+            <div class="card__head">
+              <h3>Investigation Mystery Game</h3>
+              <span class="card__meta">2023</span>
+            </div>
+            <p>A Unity investigation / mystery game with custom shaders, built in C# as a
+              university games-development project.</p>
+            <div class="card__tags">
+              <span class="chip">Unity</span><span class="chip">C#</span><span class="chip">Shaders</span><span class="chip">Game Dev</span>
+            </div>
+            <div class="card__links">
+              <a href="https://github.com/Haylia/Investigation-Mystery-Game" target="_blank" rel="noopener">GitHub →</a>
+            </div>
+          </article>
+
+        </div>
       </div>
+    </section>
+  </main>
 
-    <body>
-        <br><br>
-        <h1>Personal Projects</h1>
-        <h2>Wardens</h2>
+  <footer class="footer">
+    <div class="container footer__inner">
+      <span>© 2026 Lia Jeffries</span>
+      <div class="footer__social">
+        <a href="https://github.com/Haylia" target="_blank" rel="noopener">GitHub</a>
+        <a href="https://www.linkedin.com/in/liavjeffries/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="mailto:liavjeffries@gmail.com">Email</a>
+      </div>
+    </div>
+  </footer>
 
-        <h2>CH Timer Bot</h2>
-
-        <h2>CH Leaderboard Bot</h2>
-
-        <h2>CH DKP Bot V1</h2>
-
-        <h2>CH DKP Bot V2</h2>
-
-        <h2>Marvel Rivals Bot</h2>
-
-        <h2>Quote Bot</h2>
-
-        <h2>Instagram Post Scraper</h2>
-    </body>
+</body>
 </html>
