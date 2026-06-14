@@ -25,10 +25,10 @@
 
 == Summary
 Computer Science graduate (BSc Hons, University of Southampton) who pairs hands-on software
-development with current KYC and compliance experience at a law firm. Ships real tools — Discord
-bots, live-service game features, and AI-integrated apps — across Python, C\#, Java, Kotlin and Go,
+development with current KYC and compliance experience at a law firm. Ships real tools (Discord
+bots, live-service game features and AI-integrated apps) across Python, C\#, Java, Kotlin and Go,
 and picks up new stacks quickly. In a KYC role on complex private-equity structures, handles client
-due diligence to market standard, and brought coding into the work — a Python tool that automated a
+due diligence to market standard, and brought coding into the work with a Python tool that automated a
 manual team-reporting process. Keen to apply that developer-and-compliance blend in a software,
 regtech or KYC-engineering role.
 
@@ -59,7 +59,7 @@ regtech or KYC-engineering role.
 )
 - Co-developed a client–server mobile MMORPG in Unity (C\#) in a team of 2–5, backed by a MySQL content database.
 - Built boss and gameplay mechanics, while keeping bugs in check.
-- Created bespoke content-creation tools — custom tooling (database, effects and content editors) and a content pipeline used by the team.
+- Created bespoke content-creation tools: custom tooling (database, effects and content editors) and a content pipeline used by the team.
 - Integrated in-game Discord features (account linking, in-game mail/DM) and built supporting web pages.
 - Worked on the game's Go server program, which delivers game updates to players.
 - Now in beta with around 1,000 registered testers (peaks of around 100 concurrent).
@@ -72,7 +72,7 @@ regtech or KYC-engineering role.
   degree: "BSc Computer Science",
 )
 - Second Class Honours (2:2)
-- Dissertation: "Understanding and Using EEG Readings from the Visual Cortex to Control a Computer" — a brain–computer interface driven by visual-cortex EEG signals; marked 62% (2:1).
+- Dissertation: "Understanding and Using EEG Readings from the Visual Cortex to Control a Computer", a brain–computer interface driven by visual-cortex EEG signals; marked 62% (2:1).
 - Captured and processed signals from a g.tec Unicorn Hybrid Black EEG headset via its Python API to drive on-screen control.
 
 #edu(
@@ -156,7 +156,7 @@ regtech or KYC-engineering role.
 - Assisted customers, replenished and organised stock, sorted incoming donations, and digitised book stock into the till system.
 
 #work(
-  title: "Committee Member — Esports",
+  title: "Committee Member (Esports)",
   location: "Southampton, UK",
   company: "University of Southampton Video Games & Esports Society",
   dates: dates-helper(start-date: "May 2021", end-date: "Jan 2022"),
