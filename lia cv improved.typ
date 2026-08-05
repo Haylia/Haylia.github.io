@@ -26,8 +26,8 @@
 == Summary
 Computer Science graduate (BSc Hons, University of Southampton) who pairs hands-on software
 development with current KYC and compliance experience at a law firm. Ships real tools (Discord
-bots, live-service game features and AI-integrated apps) across Python, C\#, Java, Kotlin and Go,
-and picks up new stacks quickly. In a KYC role on complex private-equity structures, handles client
+bots, live-service game features and AI-integrated apps) across Python, C\#, Kotlin and Go.
+In a KYC role on complex private-equity structures, handles client
 due diligence to market standard, and brought coding into the work with a Python tool that automated a
 manual team-reporting process. Keen to apply that developer-and-compliance blend in a software,
 regtech or KYC-engineering role.
@@ -35,8 +35,8 @@ regtech or KYC-engineering role.
 == Technical Skills
 - *Proficient*: Python, C\#, Java, MySQL
 - *Familiar*: Kotlin, Haskell, Go, JavaScript, HTML / CSS
-- *Frameworks & Tools*: Unity, .NET, Jetpack Compose, Firebase, Git, Discord API, Google Sheets API, Claude / Claude Code
-- *Areas*: Packet capture & protocol RE, cloud computing, AI integration
+- *Frameworks & Tools*: Unity, .NET, Jetpack Compose, Firebase / Firestore, Git, Discord API, Google Sheets API, Claude / Claude Code
+- *Areas*: Packet capture & protocol reverse engineering, LLM API integration (Claude)
 
 == Professional Experience
 #work(
@@ -71,7 +71,7 @@ regtech or KYC-engineering role.
   dates: dates-helper(start-date: "Sep 2020", end-date: "Jul 2024"),
   degree: "BSc Computer Science",
 )
-- Second Class Honours (2:2)
+- Second Class Honours (2:2); programming modules taught primarily in Java.
 - Dissertation: "Understanding and Using EEG Readings from the Visual Cortex to Control a Computer", a brain–computer interface driven by visual-cortex EEG signals; marked 62% (2:1).
 - Captured and processed signals from a g.tec Unicorn Hybrid Black EEG headset via its Python API to drive on-screen control.
 
@@ -90,22 +90,6 @@ regtech or KYC-engineering role.
 // Order: strongest first. The game name is kept generic ("an MMORPG") on purpose.
 
 #project(
-  name: "Raid Points Tracker Bot",
-  dates: dates-helper(start-date: "Jul 2023", end-date: "Present"),
-  url: "github.com/Haylia/Gwydion-DKP-bot",
-)
-- Discord-command frontend with a Google Sheets backend for transparent raid loot-point (DKP) tracking in an MMORPG.
-- Python (discord.py); concurrent multi-account Sheets access via threading and tasks to keep commands responsive.
-
-#project(
-  name: "Marvel Rivals Bot",
-  dates: dates-helper(start-date: "Feb 2025", end-date: "Sep 2025"),
-  url: "github.com/Haylia/MarvelBot",
-)
-- Discord bot (Python, discord.py) that tracked player stats and leaderboards for the hero shooter Marvel Rivals.
-- Scraped live match data with headless Selenium / Chrome and cached player IDs to speed up lookups.
-
-#project(
   name: "Scrawl",
   dates: dates-helper(start-date: "Jun 2026", end-date: "Present"),
   url: "github.com/Haylia/Scrawl",
@@ -122,12 +106,12 @@ regtech or KYC-engineering role.
 - Modelled the full rule set (bids, whists, variants, bullet/mountain scoring) as a unit-tested domain layer.
 
 #project(
-  name: "MMO Timer Bot",
-  dates: dates-helper(start-date: "Mar 2024", end-date: "Present"),
-  url: "github.com/Haylia/chtimerbot",
+  name: "Raid Points Tracker Bot",
+  dates: dates-helper(start-date: "Jul 2023", end-date: "Present"),
+  url: "github.com/Haylia/Gwydion-DKP-bot",
 )
-- Discord bot (Python, discord.py) providing boss and event timers for an MMORPG community across 20 servers.
-- Replicated a popular service that was being discontinued, with refinements for onboarding and reliable uptime.
+- Discord-command frontend with a Google Sheets backend for transparent raid loot-point (DKP) tracking in an MMORPG.
+- Python (discord.py); concurrent multi-account Sheets access via threading and tasks to keep commands responsive.
 
 #project(
   name: "Live Combat Parser & Leaderboard",
@@ -137,6 +121,22 @@ regtech or KYC-engineering role.
 - Raw-socket sniffer that reverse-engineered an MMORPG's network protocol to parse live combat events.
 - Compiled raid damage leaderboards and synced them to Google Sheets via a service account.
 // NOTE: Private chscripts project (raw-socket sniffing + game-protocol RE + gspread). No public link.
+
+#project(
+  name: "MMO Timer Bot",
+  dates: dates-helper(start-date: "Mar 2024", end-date: "Present"),
+  url: "github.com/Haylia/chtimerbot",
+)
+- Discord bot (Python, discord.py) providing boss and event timers for an MMORPG community across 20 servers.
+- Replicated a popular service that was being discontinued, with refinements for onboarding and reliable uptime.
+
+#project(
+  name: "Marvel Rivals Bot",
+  dates: dates-helper(start-date: "Feb 2025", end-date: "Sep 2025"),
+  url: "github.com/Haylia/MarvelBot",
+)
+- Discord bot (Python, discord.py) that tracked player stats and leaderboards for the hero shooter Marvel Rivals.
+- Scraped live match data with headless Selenium / Chrome and cached player IDs to speed up lookups.
 
 #project(
   name: "Personal Website & Portfolio",
