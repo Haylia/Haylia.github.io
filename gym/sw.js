@@ -5,6 +5,7 @@ const CACHE = "gfo-v2";
 const CORE = [
   "./",
   "./index.html",
+  "./plan.js",
   "./manifest.webmanifest",
   "./icon-192.png",
   "./icon-512.png",
@@ -44,21 +45,24 @@ self.addEventListener("fetch", event => {
   const cacheable = sameOrigin || RUNTIME_HOSTS.some(h => req.url.startsWith(h));
   if (!cacheable) return;
 
-  // Navigations: try the network first so a new version lands, fall back to cache offline.
-  if (req.mode === "navigate") {
+  // Anything of ours (page, plan.js, icons): network first, so an update always
+  // lands, with the cache as the offline answer. No cache name to remember to bump.
+  if (req.mode === "navigate" || sameOrigin) {
     event.respondWith(
       fetch(req)
         .then(res => {
-          const copy = res.clone();
-          caches.open(CACHE).then(c => c.put("./index.html", copy)).catch(() => {});
+          if (res && res.ok) {
+            const copy = res.clone();
+            caches.open(CACHE).then(c => c.put(req.mode === "navigate" ? "./index.html" : req, copy)).catch(() => {});
+          }
           return res;
         })
-        .catch(() => caches.match("./index.html").then(r => r || caches.match("./")))
+        .catch(() => caches.match(req).then(r => r || caches.match("./index.html")))
     );
     return;
   }
 
-  // Everything else: cache first, then network, storing what comes back.
+  // Fonts and the spreadsheet library: cache first, they never change.
   event.respondWith(
     caches.match(req).then(hit => {
       if (hit) return hit;

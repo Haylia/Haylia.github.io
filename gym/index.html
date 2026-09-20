@@ -7,6 +7,7 @@
 <meta name="theme-color" content="#0D1317" media="(prefers-color-scheme: dark)">
 <meta name="description" content="Gym plan and training log: Monday lower body, Tuesday upper body and abs, Thursday run, Friday full body.">
 <link rel="manifest" href="./manifest.webmanifest">
+<script src="./plan.js"></script>
 <link rel="icon" href="./icon-192.png">
 <link rel="apple-touch-icon" href="./apple-touch-icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -115,17 +116,17 @@
   .steps{display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-top:10px}
   .steps.two{grid-template-columns:repeat(2,1fr)}
   .step{background:var(--surface-2); border:1px solid var(--line); border-radius:11px; padding:5px 6px 7px; text-align:center}
-  .step label{display:block; font-size:10.5px; text-transform:uppercase; letter-spacing:.07em; color:var(--muted); margin-bottom:2px}
-  .step-row{display:flex; align-items:center; gap:4px}
+  .step label{display:block; font-size:10.5px; text-transform:uppercase; letter-spacing:.07em; color:var(--muted); margin-bottom:1px}
+  .step-row{display:flex; align-items:center; gap:6px; margin-top:4px}
   .step button{
     appearance:none; border:1px solid var(--line-strong); background:var(--field); color:var(--ink);
-    width:34px; height:34px; min-width:34px; border-radius:9px; font-size:19px; line-height:1; cursor:pointer;
-    display:flex; align-items:center; justify-content:center;
+    flex:1 1 0; min-width:0; height:34px; border-radius:9px; font-size:19px; line-height:1; cursor:pointer;
+    display:flex; align-items:center; justify-content:center; touch-action:manipulation;
   }
   .step button:active{background:var(--line)}
   .step input{
-    flex:1; width:100%; min-width:0; border:0; background:transparent; color:var(--ink); text-align:center;
-    font-family:"Barlow Condensed",sans-serif; font-weight:700; font-size:22px; padding:2px 0;
+    display:block; width:100%; min-width:0; border:0; background:transparent; color:var(--ink); text-align:center;
+    font-family:"Barlow Condensed",sans-serif; font-weight:700; font-size:26px; line-height:1.1; padding:1px 0 2px;
     font-variant-numeric:tabular-nums;
   }
   .step input:focus{outline:2px solid var(--accent); outline-offset:2px; border-radius:6px}
@@ -234,124 +235,71 @@
 (function(){
 "use strict";
 
-/* ------------------------------------------------------------------ plan */
-const PLAN = {
-  mon: {
-    label:"Monday", short:"Mon", sub:"Lower body", accent:"--mon", offset:0,
-    flow:"5–7 min warm-up cardio → 2 min mobility → 35 min weights + core → 10 min incline walk → 5 min stretch",
-    warm:["5–7 min","Easy bike or cross-trainer — gentle pace, just enough to feel warm and breathe a little harder."],
-    mob:["2 min","10 leg swings each way (front–back and side–side) + 10 bodyweight squats. Dynamic moves only."],
-    ex:[
-      {k:"squat", n:"Back Squat", target:"4 × 6–8", sets:4, hi:8, start:55, step:2.5, kind:"kg", rest:"Rest 2–3 min",
-       tip:"Warm-up sets first: empty bar ×10, 30kg ×5, 45kg ×3. Brace your core, hips back and down to at least parallel, drive up through mid-foot."},
-      {k:"rdl", n:"Romanian Deadlift", target:"3 × 8–10", sets:3, hi:10, start:40, step:2.5, kind:"kg", rest:"Rest 2 min",
-       tip:"Soft knees, push hips back, bar slides close down your thighs, stop at a strong hamstring stretch. Flat back throughout."},
-      {k:"lunge", n:"DB Walking Lunge", target:"3 × 10–12 each leg", sets:3, hi:12, start:8, step:1, kind:"kg", rest:"Rest 90 s",
-       tip:"kg is per dumbbell. Long stride, back knee almost touches the floor, stay tall. Log reps per leg."},
-      {k:"legpress", n:"Leg Press", target:"3 × 10–12", sets:3, hi:12, start:60, step:5, kind:"kg", rest:"Rest 90 s",
-       tip:"Pick a load that leaves about 2 reps in the tank. Feet shoulder-width, don't lock your knees at the top."},
-      {k:"deadbug", n:"Dead Bug", target:"3 × 8–12 each side", sets:3, hi:12, kind:"bw", rl:"Reps", rest:"Core · rest 45 s",
-       tip:"Lie on your back, arms up, knees at 90°. Lower opposite arm and leg slowly, keeping your lower back pressed into the floor."}
-    ],
-    finish:["10 min","Incline walk — treadmill at 10–12%, brisk pace."],
-    stretch:[
-      ["Kneeling hip-flexor + quad","Kneel in a lunge, tuck your pelvis under, push hips forward. Reach back for your foot to add the quad."],
-      ["Figure-4 glute stretch","On your back, cross one ankle over the other knee and pull the bottom leg in (or do pigeon pose)."],
-      ["Seated hamstring stretch","Sit tall, one leg straight, hinge forward from the hips with a flat back."]
-    ]
-  },
-  tue: {
-    label:"Tuesday", short:"Tue", sub:"Upper + abs", accent:"--tue", offset:1,
-    flow:"5–7 min warm-up cardio → 2 min mobility → 32 min upper body → 8 min abs → 7 min sprints → 5 min stretch",
-    warm:["5–7 min","Easy rower — warms up your back and arms as well as your legs."],
-    mob:["2 min","10 arm circles each way + 10 band pull-aparts + 5 slow scapular pull-ups hanging from the bar."],
-    ex:[
-      {k:"pullup", n:"Assisted Pull-up", target:"3 × 6–8", sets:3, hi:8, start:50, step:2.5, kind:"assist", rest:"Rest 2 min",
-       tip:"Log the ASSISTANCE weight — lower is stronger. Full hang, chin over the bar, lower slowly (3 s). Hit 3×8 and drop the assist by 2.5–5kg."},
-      {k:"dbbench", n:"DB Bench Press", target:"3 × 8–10", sets:3, hi:10, start:7, step:1, kind:"kg", rest:"Rest 90 s",
-       tip:"kg is per dumbbell. Shoulder blades squeezed back and down, lower to chest level, press up and slightly together."},
-      {k:"row", n:"Seated Cable Row", target:"3 × 10–12", sets:3, hi:12, start:25, step:2.5, kind:"kg", rest:"Rest 90 s",
-       tip:"Chest up, pull the handle to your belly button, squeeze the shoulder blades, slow return."},
-      {k:"ohp", n:"DB Shoulder Press", target:"3 × 8–10", sets:3, hi:10, start:6, step:1, kind:"kg", rest:"Rest 90 s",
-       tip:"Seated with your back supported. Press up without arching your lower back."},
-      {k:"curl", n:"DB Bicep Curl", target:"3 × 10–12", sets:3, hi:12, start:6, step:1, kind:"kg", rest:"Superset with pushdowns",
-       tip:"Straight into the tricep pushdowns, then rest 60 s. Elbows pinned to your sides, no swinging, 2–3 s lowering."},
-      {k:"tricep", n:"Tricep Rope Pushdown", target:"3 × 10–12", sets:3, hi:12, start:10, step:2.5, kind:"kg", rest:"Rest 60 s",
-       tip:"Elbows tucked at your sides, spread the rope apart at the bottom."},
-      {k:"plank", n:"Plank", target:"3 × 30–60 s", sets:3, hi:60, kind:"bw", rl:"Secs", rest:"Abs circuit · rest 30 s",
-       tip:"Three rounds: plank → knee raise → side plank. Squeeze your glutes, ribs down, straight line head to heels."},
-      {k:"kneeraise", n:"Hanging Knee Raise", target:"3 × 8–15", sets:3, hi:15, kind:"bw", rl:"Reps", rest:"Rest 30 s",
-       tip:"Captain's chair or hanging from the bar. Curl your pelvis up, no swinging. Builds grip and shoulders for pull-ups too."},
-      {k:"sideplank", n:"Side Plank", target:"3 × 20–40 s each side", sets:3, hi:40, kind:"bw", rl:"Secs", rest:"Rest 30 s",
-       tip:"Hips high, body in a straight line. Log the seconds held per side."}
-    ],
-    finish:["7 min","Rower or bike sprints — 30 s hard / 30 s easy × 7."],
-    stretch:[
-      ["Kneeling lat stretch","Kneel facing a bench, hands on it, sink your hips back and chest down."],
-      ["Doorway chest stretch","Forearm on a rack upright at shoulder height, step through until you feel the chest and front of the shoulder."],
-      ["Overhead tricep stretch","Reach one hand down your upper back and gently push the elbow with the other hand."]
-    ]
-  },
-  thu: {
-    label:"Thursday", short:"Thu", sub:"Run day", accent:"--thu", offset:3, run:true,
-    flow:"5 min warm-up (walk → jog) → 1 min drills → 35–50 min main set → 3 min walk → 5 min stretch",
-    warm:["5 min","Brisk walk 2 min, then an easy jog for 3 min."],
-    mob:["1 min","10 leg swings each way + 10 walking lunges or high knees."],
-    stretch:[
-      ["Calf stretch","Hands on a wall, one leg back with the heel down. 30 s with a straight knee, then 30 s with it bent."],
-      ["Kneeling hip-flexor + quad","Kneel in a lunge, tuck your pelvis, push your hips forward; reach back for your foot."],
-      ["Standing hamstring stretch","Heel on a low step, leg straight, hinge forward with a flat back."]
-    ]
-  },
-  fri: {
-    label:"Friday", short:"Fri", sub:"Full body", accent:"--fri", offset:4,
-    flow:"5–7 min warm-up cardio → 2 min mobility → 35 min weights + core → 10 min rower intervals → 5 min stretch",
-    warm:["5–7 min","Easy cross-trainer or bike — works arms and legs, which suits a full-body day."],
-    mob:["2 min","10 hip hinges (hands on hips, no weight) + 10 glute bridges + 10 arm circles each way."],
-    ex:[
-      {k:"deadlift", n:"Deadlift", target:"4 × 5–6", sets:4, hi:6, start:50, step:2.5, kind:"kg", rest:"Rest 2–3 min",
-       tip:"Warm-up sets: 30kg ×5, 40kg ×3. Bar over mid-foot, flat back, push the floor away, finish by squeezing your glutes. Reset each rep."},
-      {k:"pulldown", n:"Lat Pulldown", target:"3 × 8–10", sets:3, hi:10, start:30, step:2.5, kind:"kg", rest:"Rest 90 s",
-       tip:"Pull the bar to your upper chest, elbows down and back, no leaning back. Your key pull-up builder."},
-      {k:"incline", n:"Incline DB Press", target:"3 × 8–10", sets:3, hi:10, start:6, step:1, kind:"kg", rest:"Rest 90 s",
-       tip:"Bench at about 30°. kg is per dumbbell."},
-      {k:"bss", n:"Bulgarian Split Squat", target:"3 × 8–10 each leg", sets:3, hi:10, start:6, step:1, kind:"kg", rest:"Rest 90 s",
-       tip:"Rear foot on a bench, most of the weight on the front leg, drop straight down. Log reps per leg."},
-      {k:"dbrow", n:"1-Arm DB Row", target:"3 × 10–12 each arm", sets:3, hi:12, start:10, step:2, kind:"kg", rest:"Rest 60 s",
-       tip:"Hand and knee on the bench, pull the dumbbell to your hip, don't twist."},
-      {k:"pallof", n:"Pallof Press", target:"3 × 10 each side", sets:3, hi:12, start:5, step:2.5, kind:"kg", rest:"Core · rest 45 s",
-       tip:"Stand side-on to a cable at chest height, press the handle straight out, hold 2 s, resist being twisted."}
-    ],
-    finish:["10 min","Rower intervals — 1 min hard / 1 min easy × 5."],
-    stretch:[
-      ["Standing hamstring stretch","Heel on a low box, leg straight, hinge forward with a flat back."],
-      ["Kneeling hip-flexor stretch","Lunge position, tuck the pelvis, push your hips forward."],
-      ["Child's pose with side reach","Sit back on your heels, arms long, then walk both hands to one side for the lats. Swap sides."]
-    ]
-  }
-};
-const DAYS = ["mon","tue","thu","fri"];
-const WEIGHT_DAYS = ["mon","tue","fri"];
-const MAX_WEEK = 104;
+/* ------------------------------------------------------------------ plan
+   The plan lives in plan.js so it can be edited without touching the app.
+   This turns that file into the shapes the screens below expect. */
+const CFG = (window.GYM_PLAN && window.GYM_PLAN.days) ? window.GYM_PLAN : {days:{}, running:{}};
+const PLAN = {};
+const planProblems = [];
+const seenKeys = {};
 
-function intervalTarget(k){
-  const ladder = [[6,1.5],[7,1.5],[8,1.5],[6,2],[7,2],[8,2],[6,2.5],[7,2.5],[6,3],[7,3]];
-  const idx = Math.floor((k-1)/2);
-  if (idx < ladder.length){ const [n,f] = ladder[idx]; return n+" × ("+f+" min fast / 1 min easy)"; }
-  return "7 × (3 min fast / 1 min easy) — now push the fast pace";
-}
-function enduranceTarget(k){
-  const mins = [40,42,44,46,48,50];
-  return k <= mins.length ? mins[k-1]+" min steady, easy pace" : "50 min steady — aim to beat your distance";
-}
+Object.keys(CFG.days).forEach(id=>{
+  const d = CFG.days[id] || {};
+  const weekday = Math.min(7, Math.max(1, d.weekday || 1));
+  const ex = (d.exercises || []).map(e=>{
+    const kind = e.type === "assisted" ? "assist" : e.type === "bodyweight" ? "bw" : "kg";
+    if (!e.key) planProblems.push((e.name || "An exercise") + " has no key");
+    else if (seenKeys[e.key]) planProblems.push('Two exercises share the key "' + e.key + '"');
+    if (e.key) seenKeys[e.key] = true;
+    return {
+      k: e.key, n: e.name || e.key, target: e.target || "", sets: e.sets || 3,
+      hi: e.topReps || 10, start: kind === "bw" ? undefined : e.startKg,
+      step: e.stepKg || 2.5, kind, rl: e.unit || "Reps", rest: e.rest || "",
+      tip: e.how || "", tile: !!e.tile
+    };
+  });
+  PLAN[id] = {
+    label: d.label || id,
+    short: (d.label || id).slice(0,3),
+    sub: d.focus || "",
+    accent: d.colour || "--mon",
+    weekday, offset: weekday - 1,
+    flow: d.flow || "",
+    warm: [(d.warmUp||{}).time || "", (d.warmUp||{}).how || ""],
+    mob:  [(d.mobility||{}).time || "", (d.mobility||{}).how || ""],
+    ex,
+    run: d.type === "run",
+    finish: [(d.finisher||{}).time || "", (d.finisher||{}).how || ""],
+    stretch: (d.stretches || []).map(s=>[s.name, s.how])
+  };
+});
+
+const DAYS = Object.keys(PLAN).sort((a,b)=> PLAN[a].weekday - PLAN[b].weekday);
+const WEIGHT_DAYS = DAYS.filter(d=>!PLAN[d].run);
+const RUN_DAYS = DAYS.filter(d=>PLAN[d].run);
+const MAX_WEEK = 104;
+const DELOAD_EVERY = CFG.deloadEvery === 0 ? 0 : (CFG.deloadEvery || 8);
+if (!DAYS.length) planProblems.push("plan.js didn't load, or it has no days in it");
+
 function runPlan(week){
-  const intervals = week % 2 === 1;
+  const R = CFG.running || {};
   const k = Math.ceil(week/2);
-  return intervals
-    ? {type:"Intervals", target:intervalTarget(k),
-       note:"Fast is hard but controlled — a few words, not sentences. Easy is a slow jog or walk. If you can't finish the rounds, repeat this target next time."}
-    : {type:"Endurance", target:enduranceTarget(k),
-       note:"Easy, chatty pace — slower than you think. This is the aerobic base that makes the intervals easier."};
+  if (week % 2 === 1){
+    const step = (R.intervals || [])[Math.floor((k-1)/2)];
+    return {
+      type: "Intervals",
+      target: step ? step.rounds + " × (" + step.fastMins + " min fast / 1 min easy)" : (R.intervalsThen || "Intervals"),
+      note: R.intervalsNote || "",
+      rounds: step ? step.rounds : null, mins: null
+    };
+  }
+  const mins = (R.endurance || [])[k-1];
+  return {
+    type: "Endurance",
+    target: mins ? mins + " min steady, easy pace" : (R.enduranceThen || "Steady run"),
+    note: R.enduranceNote || "",
+    rounds: null, mins: mins || null
+  };
 }
 
 /* ----------------------------------------------------------------- state */
@@ -359,7 +307,7 @@ const LS_KEY = "gymming-for-olives-v1";
 const state = {
   settings:{ start:"2026-09-21" },
   sessions:{},              // "w01-mon" -> {week, day, entries:{k:{kg,sets,reps}}, notes, updatedAt}
-  view:"session", week:1, day:"mon",
+  view:"session", week:1, day:"",
   db:null, dbState:"connecting", dirty:{}
 };
 
@@ -480,6 +428,12 @@ function showHealth(){
   b.textContent = "This phone isn't keeping your log — private browsing or a storage setting is blocking it. What you type now will be lost when you close the app.";
   main.insertBefore(b, main.firstChild);
 }
+function showPlanProblems(){
+  if (!planProblems.length) return;
+  const b = el("div","banner");
+  b.textContent = "Check plan.js: " + planProblems.join("; ") + ".";
+  main.insertBefore(b, main.firstChild);
+}
 
 const key = (w,d) => "w" + String(w).padStart(2,"0") + "-" + d;
 function session(w,d){
@@ -514,12 +468,14 @@ function currentWeek(){
   return Math.min(MAX_WEEK, Math.max(1, Math.floor(ms/(7*864e5)) + 1));
 }
 function todayDay(){
-  const wd = new Date().getDay();               // 0 Sun … 6 Sat
-  const map = {1:"mon", 2:"tue", 4:"thu", 5:"fri"};
-  if (map[wd]) return map[wd];
-  return wd === 3 ? "thu" : wd === 6 || wd === 0 ? "mon" : "mon";
+  const js = new Date().getDay();               // 0 Sun … 6 Sat
+  const iso = js === 0 ? 7 : js;                // 1 Mon … 7 Sun, like plan.js
+  const exact = DAYS.filter(d=>PLAN[d].weekday === iso)[0];
+  if (exact) return exact;
+  const next = DAYS.filter(d=>PLAN[d].weekday > iso)[0];
+  return next || DAYS[0];
 }
-const isDeload = w => w % 8 === 0;
+const isDeload = w => DELOAD_EVERY > 0 && w % DELOAD_EVERY === 0;
 
 /* --------------------------------------------------------------- persist */
 const writeQueue = {};
@@ -635,7 +591,8 @@ function stepper(labelText, value, opts, onChange){
   plus.addEventListener("click", ()=>bump(1));
   input.addEventListener("change", ()=> onChange(num(input.value)));
   input.addEventListener("blur", ()=> onChange(num(input.value)));
-  row.appendChild(minus); row.appendChild(input); row.appendChild(plus);
+  wrap.appendChild(input);
+  row.appendChild(minus); row.appendChild(plus);
   wrap.appendChild(row);
   return wrap;
 }
@@ -723,6 +680,11 @@ function exerciseCard(ex, w, d){
   const save = (field, v) => touch(w,d, s=>{
     s.entries = s.entries || {};
     s.entries[ex.k] = Object.assign({}, s.entries[ex.k], {[field]: v === null ? "" : v});
+    // keep the name with the log, so history survives the exercise leaving the plan
+    state.settings.exNames = state.settings.exNames || {};
+    state.settings.exNames[ex.k] = ex.n;
+    state.settings.exDays = state.settings.exDays || {};
+    state.settings.exDays[ex.k] = d;
   });
   if (ex.kind !== "bw"){
     steps.appendChild(stepper(ex.kind === "assist" ? "Assist kg" : "kg", num(e.kg), {
@@ -759,8 +721,8 @@ function runCard(w){
     s.entries.run = Object.assign({}, s.entries.run, {[field]: v === null ? "" : v});
   });
   const steps = el("div","steps");
-  steps.appendChild(stepper("Rounds", num(e.rounds), {id:"run-"+w+"-rounds", step:1, placeholder: rp.type === "Intervals" ? parseInt(rp.target,10) : "–"}, v=>{ save("rounds",v); }));
-  steps.appendChild(stepper("Minutes", num(e.time), {id:"run-"+w+"-time", step:1, placeholder: rp.type === "Endurance" ? parseInt(rp.target,10) : 20}, v=>{ save("time",v); updatePace(); }));
+  steps.appendChild(stepper("Rounds", num(e.rounds), {id:"run-"+w+"-rounds", step:1, placeholder: rp.rounds === null ? "–" : rp.rounds}, v=>{ save("rounds",v); }));
+  steps.appendChild(stepper("Minutes", num(e.time), {id:"run-"+w+"-time", step:1, placeholder: rp.mins === null ? 20 : rp.mins}, v=>{ save("time",v); updatePace(); }));
   steps.appendChild(stepper("km", num(e.dist), {id:"run-"+w+"-dist", step:0.5, placeholder:"–"}, v=>{ save("dist",v); updatePace(); }));
   body.appendChild(steps);
   const pace = el("div","ex-meta");
@@ -901,33 +863,42 @@ function renderProgress(){
   const sessionsLogged = Object.keys(state.sessions).filter(k=>hasData(state.sessions[k])).length;
   const runs = runHistory();
   const totalKm = runs.reduce((a,r)=>a + (r.dist||0), 0);
-  const sq = historyOf("mon","squat").filter(r=>r.kg!==null);
-  const dl = historyOf("fri","deadlift").filter(r=>r.kg!==null);
-  const pu = historyOf("tue","pullup").filter(r=>r.kg!==null);
-  const bestSq = sq.length ? Math.max.apply(null, sq.map(r=>r.kg)) : null;
-  const bestDl = dl.length ? Math.max.apply(null, dl.map(r=>r.kg)) : null;
-  const assistNow = pu.length ? Math.min.apply(null, pu.map(r=>r.kg)) : null;
-  const assistStart = 50;
-  const pct = assistNow === null ? 0 : Math.max(0, Math.min(1, (assistStart - assistNow)/assistStart));
 
   const tiles = el("div","tiles");
   tiles.appendChild(tile("Sessions logged", String(sessionsLogged), "since week 1"));
-  tiles.appendChild(tile("Total distance", (Math.round(totalKm*10)/10) + " km", runs.length + (runs.length === 1 ? " run" : " runs")));
-  tiles.appendChild(tile("Best squat", bestSq === null ? "—" : bestSq + " kg", bestSq === null ? "start 55 kg" : "start 55 kg"));
-  tiles.appendChild(tile("Best deadlift", bestDl === null ? "—" : bestDl + " kg", bestDl === null ? "start 50 kg" : "start 50 kg"));
+  if (RUN_DAYS.length){
+    tiles.appendChild(tile("Total distance", (Math.round(totalKm*10)/10) + " km", runs.length + (runs.length === 1 ? " run" : " runs")));
+  }
+  // Tiles come from `tile: true` in plan.js, so changing the plan changes these.
+  lifts.filter(l=>l.ex.tile && l.ex.kind !== "assist").slice(0,3).forEach(({day, ex})=>{
+    const h = historyOf(day, ex.k).filter(r=>r.kg !== null);
+    const best = h.length ? Math.max.apply(null, h.map(r=>r.kg)) : null;
+    tiles.appendChild(tile("Best " + ex.n.toLowerCase(), best === null ? "—" : best + " kg",
+      ex.start === undefined ? PLAN[day].short : "start " + ex.start + " kg"));
+  });
   main.appendChild(tiles);
 
-  const pullCard = el("div","card pad");
-  pullCard.appendChild(el("div","eyebrow","Pull-up journey"));
-  const pr = el("div"); pr.style.display = "flex"; pr.style.alignItems = "baseline"; pr.style.gap = "8px";
-  const big = el("div","dsp", Math.round(pct*100) + "%");
-  big.style.fontSize = "30px"; big.style.color = "var(--tue)";
-  pr.appendChild(big);
-  pr.appendChild(el("div","help", assistNow === null ? "starting at 50 kg of assistance" : "assistance down to " + assistNow + " kg — 0 kg is an unassisted pull-up"));
-  pullCard.appendChild(pr);
-  const bar = el("div","bar"); const fillEl = el("i"); fillEl.style.width = (pct*100) + "%"; fillEl.style.background = "var(--tue)";
-  bar.appendChild(fillEl); pullCard.appendChild(bar);
-  main.appendChild(pullCard);
+  // Any assisted machine counts down to zero — the plan says which, not the app.
+  lifts.filter(l=>l.ex.kind === "assist").forEach(({day, ex})=>{
+    const h = historyOf(day, ex.k).filter(r=>r.kg !== null);
+    const now = h.length ? Math.min.apply(null, h.map(r=>r.kg)) : null;
+    const startKg = ex.start || 0;
+    const pct = (now === null || !startKg) ? 0 : Math.max(0, Math.min(1, (startKg - now)/startKg));
+    const card = el("div","card pad");
+    card.appendChild(el("div","eyebrow", ex.n + " journey"));
+    const pr = el("div"); pr.style.display = "flex"; pr.style.alignItems = "baseline"; pr.style.gap = "8px";
+    const big = el("div","dsp", Math.round(pct*100) + "%");
+    big.style.fontSize = "30px"; big.style.color = "var(" + PLAN[day].accent + ")";
+    pr.appendChild(big);
+    pr.appendChild(el("div","help", now === null
+      ? "starting at " + startKg + " kg of assistance"
+      : "assistance down to " + now + " kg — 0 kg is unassisted"));
+    card.appendChild(pr);
+    const bar = el("div","bar"); const fillEl = el("i");
+    fillEl.style.width = (pct*100) + "%"; fillEl.style.background = "var(" + PLAN[day].accent + ")";
+    bar.appendChild(fillEl); card.appendChild(bar);
+    main.appendChild(card);
+  });
 
   // per-lift small multiples — one series each, so color stays identity-free
   const liftCard = el("div","card");
@@ -973,8 +944,50 @@ function renderProgress(){
     main.appendChild(empty);
   }
 
+  // Anything logged that is no longer in the plan still has a home here.
+  const current = {};
+  DAYS.forEach(d => PLAN[d].ex.forEach(ex => { current[ex.k] = true; }));
+  const past = {};
+  Object.keys(state.sessions).forEach(sk=>{
+    const s = state.sessions[sk];
+    Object.keys(s.entries || {}).forEach(k=>{
+      if (k === "run" || current[k]) return;
+      const e = s.entries[k];
+      const kg = num(e.kg), reps = num(e.reps);
+      if (kg === null && reps === null) return;
+      (past[k] = past[k] || []).push({week:s.week, kg, sets:num(e.sets), reps});
+    });
+  });
+  const pastKeys = Object.keys(past);
+  if (pastKeys.length){
+    const head = el("div","eyebrow","Past exercises");
+    head.style.padding = "12px 14px 0";
+    main.appendChild(head);
+    const card = el("div","card");
+    pastKeys.forEach(k=>{
+      const rows = past[k].sort((a,b)=>a.week-b.week);
+      const withKg = rows.filter(r=>r.kg !== null);
+      const box = el("div","lift");
+      const top = el("div","lift-top");
+      top.appendChild(el("h3", null, (state.settings.exNames||{})[k] || k));
+      if (withKg.length){
+        const b = el("div","best", Math.max.apply(null, withKg.map(r=>r.kg)) + " kg");
+        b.style.color = "var(--muted)";
+        top.appendChild(b);
+      }
+      box.appendChild(top);
+      box.appendChild(el("div","sub","No longer in the plan · " + rows.length + " session" + (rows.length===1?"":"s") +
+        " · weeks " + rows[0].week + "–" + rows[rows.length-1].week));
+      if (withKg.length > 1){
+        box.appendChild(lineChart(withKg.map(r=>({x:r.week, y:r.kg})), {color:"var(--muted)", unit:"kg", label:((state.settings.exNames||{})[k] || k) + " weight by week"}));
+      }
+      card.appendChild(box);
+    });
+    main.appendChild(card);
+  }
+
   const runCardBox = el("div","card pad");
-  runCardBox.appendChild(el("div","eyebrow","Thursday runs"));
+  runCardBox.appendChild(el("div","eyebrow", (RUN_DAYS.length ? PLAN[RUN_DAYS[0]].label : "Run") + " runs"));
   if (runs.length){
     const dRuns = runs.filter(r=>r.dist !== null);
     if (dRuns.length){
@@ -1033,6 +1046,15 @@ function buildWorkbook(){
       num(e.rounds) ?? "", num(e.time) ?? "", num(e.dist) ?? "", paceText(num(e.time), num(e.dist)), s.notes || ""]);
   }
   XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(rrows), "Thu - Run");
+
+  // A key sheet, so a re-import still matches after an exercise is renamed.
+  const krows = [["Day","Key","Exercise"]];
+  DAYS.forEach(d => PLAN[d].ex.forEach(ex => krows.push([d, ex.k, ex.n])));
+  const names = state.settings.exNames || {}, exDays = state.settings.exDays || {};
+  Object.keys(names).forEach(k=>{
+    if (!DAYS.some(d => PLAN[d].ex.some(ex => ex.k === k))) krows.push([exDays[k] || "", k, names[k]]);
+  });
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(krows), "Keys");
   return XLSX.write(wb, {bookType:"xlsx", type:"array"});
 }
 
@@ -1086,15 +1108,25 @@ function backupAge(){
 function normName(s){ return String(s||"").toLowerCase().replace(/[^a-z0-9]/g,""); }
 function dayOfSheet(name){
   const n = normName(name);
-  if (n.startsWith("mon")) return "mon";
-  if (n.startsWith("tue")) return "tue";
-  if (n.startsWith("thu")) return "thu";
-  if (n.startsWith("fri")) return "fri";
-  return null;
+  const hit = DAYS.filter(d => n.indexOf(normName(PLAN[d].short)) === 0 || n.indexOf(d) === 0)[0];
+  return hit || null;
 }
 function importWorkbook(buf){
   const wb = XLSX.read(buf, {type:"array"});
   let cells = 0, weeks = 0;
+
+  // If the file carries a key sheet, names can have changed and still match.
+  const keyMap = {}, keyNames = {};
+  const keySheet = wb.SheetNames.filter(n=>normName(n).indexOf("keys") === 0)[0];
+  if (keySheet){
+    XLSX.utils.sheet_to_json(wb.Sheets[keySheet], {header:1, blankrows:false}).forEach(r=>{
+      if (!r || r.length < 3) return;
+      const day = String(r[0]||"").trim(), k = String(r[1]||"").trim(), nm = String(r[2]||"").trim();
+      if (!k || normName(k) === "key") return;
+      keyMap[day + "|" + normName(nm)] = k;
+      keyNames[k] = nm;
+    });
+  }
   wb.SheetNames.forEach(sheetName=>{
     const day = dayOfSheet(sheetName);
     if (!day) return;
@@ -1103,7 +1135,7 @@ function importWorkbook(buf){
     if (hi < 0) return;
     const head = rows[hi], sub = rows[hi+1] || [];
 
-    if (day === "thu"){
+    if (PLAN[day] && PLAN[day].run){
       const col = {};
       head.forEach((h,i)=>{ col[normName(h)] = i; });
       for (let i=hi+1; i<rows.length; i++){
@@ -1129,7 +1161,13 @@ function importWorkbook(buf){
       const nm = normName(head[c]);
       if (!nm || nm === "notes" || nm === "weektype") continue;
       const ex = EX_BY_NAME[day + "|" + nm];
-      if (ex) groups.push({ex, c});
+      // current plan first, then the file's own key sheet, then names we have logged before
+      let k = ex ? ex.k : (keyMap[day + "|" + nm] || null);
+      if (!k){
+        const names = state.settings.exNames || {};
+        k = Object.keys(names).filter(kk => normName(names[kk]) === nm)[0] || null;
+      }
+      if (k) groups.push({k, name: ex ? ex.n : (keyNames[k] || String(head[c])), c});
     }
     const notesCol = head.findIndex(h => normName(h).startsWith("notes"));
     if (!groups.length) return;
@@ -1138,13 +1176,18 @@ function importWorkbook(buf){
       const w = num(r[0]); if (!w || w < 1 || w > MAX_WEEK) continue;
       let got = 0;
       const vals = {};
-      groups.forEach(({ex,c})=>{
+      groups.forEach(g=>{
+        const c = g.c;
         // a group is kg/Sets/Reps, or Sets/Reps for bodyweight moves — the sub-header says which
         const twoCol = normName(sub[c]) === "sets";
         const kg = twoCol ? null : num(r[c]);
         const sets = num(r[twoCol ? c : c+1]), reps = num(r[twoCol ? c+1 : c+2]);
         if (kg === null && sets === null && reps === null) return;
-        vals[ex.k] = {kg: kg ?? "", sets: sets ?? "", reps: reps ?? ""};
+        vals[g.k] = {kg: kg ?? "", sets: sets ?? "", reps: reps ?? ""};
+        state.settings.exNames = state.settings.exNames || {};
+        if (!state.settings.exNames[g.k]) state.settings.exNames[g.k] = g.name;
+        state.settings.exDays = state.settings.exDays || {};
+        if (!state.settings.exDays[g.k]) state.settings.exDays[g.k] = day;
         got += [kg,sets,reps].filter(v=>v!==null).length;
       });
       const notes = notesCol > -1 ? r[notesCol] : "";
@@ -1325,6 +1368,8 @@ function render(){
   if (state.view === "session") renderSession();
   else if (state.view === "progress") renderProgress();
   else renderData();
+  showPlanProblems();
+  showHealth();
   [["tabSession","session"],["tabProgress","progress"],["tabData","data"]].forEach(([id,v])=>{
     document.getElementById(id).setAttribute("aria-pressed", String(state.view === v));
   });
@@ -1348,6 +1393,7 @@ window.addEventListener("pagehide", ()=>{ if (state.pendingNotes) state.pendingN
 loadLocal();
 state.week = currentWeek();
 state.day = todayDay();
+if (planProblems.length) console.warn("Plan problems:", planProblems);
 render();
 askForPersistence();
 

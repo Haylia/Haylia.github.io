@@ -9,7 +9,8 @@ backup.
 
 | File | What it is |
 |---|---|
-| `index.html` | the whole app — plan, log, progress charts, Excel import/export |
+| **`plan.js`** | **the training plan — the only file you need to edit to change it** |
+| `index.html` | the app — screens, logging, progress charts, Excel import/export |
 | `manifest.webmanifest` | makes "Add to Home screen" install it with an icon, full screen |
 | `sw.js` | offline cache, so it opens with no signal in the gym |
 | `icon-*.png`, `apple-touch-icon.png` | app icons |
@@ -26,11 +27,27 @@ site it is public to anyone who knows the address.
 The first load fetches the fonts and the spreadsheet library and then keeps them,
 so after that it opens with no signal.
 
-## Changing it later
+## Changing the plan
 
-Edit `index.html`, commit, and push. The live site updates within a minute or so.
-**Bump the `CACHE` name in `sw.js`** (for example `gfo-v2`) whenever `index.html`
-changes, or phones keep serving the cached copy.
+Edit `plan.js`, commit, push. Both phones pick it up next time they open the app
+with a signal — there is no cache version to remember any more, because the app's
+own files are fetched fresh when there's a connection and served from the cache
+only when there isn't.
+
+`plan.js` has the rules at the top. The short version:
+
+- `key` is an exercise's identity and what your history is filed under. Never
+  change or reuse one. `name` is only what's on screen, so rename freely.
+- Removing an exercise doesn't delete anything: its history moves to
+  "Past exercises" on the Progress screen.
+- Swapping one exercise for another means a new `key`, so two different lifts
+  never end up on the same chart.
+- `tile: true` gives an exercise a best-ever tile on the Progress screen.
+- An `"assisted"` exercise counts *down* to zero and gets a progress bar.
+- Training days come from `weekday` (1 = Monday). Don't rename the day ids
+  (`mon`, `tue`, …) — sessions are filed under those.
+- Get something wrong (a missing or duplicate key) and the app says so in a red
+  banner rather than silently misfiling anything.
 
 ## The data
 
