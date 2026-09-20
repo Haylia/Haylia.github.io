@@ -92,6 +92,11 @@
   .sess-head .date{color:var(--muted); font-size:13px; margin-left:auto}
   .flow{color:var(--ink-2); font-size:12.5px; margin:-4px 0 2px}
   .deload{background:var(--good-bg); color:var(--warn); border:1px solid var(--line); border-radius:8px; padding:8px 10px; font-size:13px}
+  .banner{background:#FDE7E3; color:#8C2F1B; border:1px solid #F3B8AC; border-radius:10px; padding:10px 12px; font-size:13px}
+  :root:not([data-theme="light"]) .banner{background:#2E1512; color:#FFB3A2; border-color:#5C2A21}
+  :root[data-theme="dark"] .banner{background:#2E1512; color:#FFB3A2; border-color:#5C2A21}
+  @media (prefers-color-scheme: light){ :root:not([data-theme="dark"]) .banner{background:#FDE7E3; color:#8C2F1B; border-color:#F3B8AC} }
+  .warnchip{background:var(--good-bg); color:var(--warn); border-radius:999px; padding:2px 9px; font-size:12px; font-weight:600; display:inline-block}
 
   .card{background:var(--surface); border:1px solid var(--line); border-radius:14px; box-shadow:var(--shadow)}
   .card.pad{padding:12px 14px}
@@ -358,23 +363,122 @@ const state = {
   db:null, dbState:"connecting", dirty:{}
 };
 
-function loadLocal(){
+/* Storage is layered, so one failure can't take the log with it:
+   1. localStorage — the working copy, written and then read back to check it landed
+   2. a rolling previous copy — a half-written or corrupt save can't erase history
+   3. IndexedDB — a second copy in a different store, restored automatically
+   Plus persistent-storage permission, which stops the browser evicting it all
+   when the phone is short of space. The .json backup is the off-device copy. */
+const PREV_KEY = LS_KEY + ":prev";
+let storageWorks = true;
+let saveHealthy = true;
+
+function snapshot(){
+  return {v:1, settings:state.settings, sessions:state.sessions, savedAt:Date.now()};
+}
+function readRaw(k){
+  try{ return localStorage.getItem(k); }catch(e){ return null; }
+}
+function parseSnap(raw){
+  if (!raw) return null;
   try{
-    const raw = localStorage.getItem(LS_KEY);
-    if (raw){
-      const o = JSON.parse(raw);
-      if (o && typeof o === "object"){
-        if (o.settings && o.settings.start) state.settings.start = o.settings.start;
-        if (o.sessions && typeof o.sessions === "object") state.sessions = o.sessions;
-        if (o.dirty && typeof o.dirty === "object") state.dirty = o.dirty;
-      }
-    }
-  }catch(e){ /* private mode or blocked storage — carry on in memory */ }
+    const o = typeof raw === "string" ? JSON.parse(raw) : raw;
+    if (o && typeof o === "object" && o.sessions && typeof o.sessions === "object") return o;
+  }catch(e){}
+  return null;
+}
+function mergeSnap(o){                       // newest copy of each session wins
+  if (!o || !o.sessions) return false;
+  let changed = false;
+  Object.keys(o.sessions).forEach(k=>{
+    const inc = o.sessions[k], mine = state.sessions[k];
+    if (!inc || typeof inc !== "object") return;
+    if (!mine || (inc.updatedAt||0) > (mine.updatedAt||0)){ state.sessions[k] = inc; changed = true; }
+  });
+  if (o.settings && (o.savedAt||0) > (state.settings.savedAt||0)){
+    state.settings = Object.assign({}, state.settings, o.settings);
+    changed = true;
+  }
+  return changed;
+}
+
+let idbPromise = null;
+function idb(){
+  if (idbPromise) return idbPromise;
+  idbPromise = new Promise(resolve=>{
+    try{
+      const req = indexedDB.open("gymming-for-olives", 1);
+      req.onupgradeneeded = ()=>{ try{ req.result.createObjectStore("state"); }catch(e){} };
+      req.onsuccess = ()=> resolve(req.result);
+      req.onerror = ()=> resolve(null);
+      req.onblocked = ()=> resolve(null);
+    }catch(e){ resolve(null); }
+  });
+  return idbPromise;
+}
+function idbSave(body){
+  idb().then(db=>{
+    if (!db) return;
+    try{ db.transaction("state","readwrite").objectStore("state").put(body, "snapshot"); }catch(e){}
+  });
+}
+function idbLoad(){
+  return idb().then(db=> new Promise(resolve=>{
+    if (!db) return resolve(null);
+    try{
+      const req = db.transaction("state","readonly").objectStore("state").get("snapshot");
+      req.onsuccess = ()=> resolve(parseSnap(req.result));
+      req.onerror = ()=> resolve(null);
+    }catch(e){ resolve(null); }
+  }));
+}
+
+function loadLocal(){
+  try{ localStorage.setItem("gfo-probe","1"); localStorage.removeItem("gfo-probe"); }
+  catch(e){ storageWorks = false; saveHealthy = false; }
+  const main = parseSnap(readRaw(LS_KEY));
+  const prev = parseSnap(readRaw(PREV_KEY));
+  if (main) mergeSnap(main);
+  if (prev) mergeSnap(prev);                 // only ever fills gaps the main copy lost
 }
 function saveLocal(){
-  try{
-    localStorage.setItem(LS_KEY, JSON.stringify({settings:state.settings, sessions:state.sessions, dirty:state.dirty}));
-  }catch(e){}
+  state.settings.savedAt = Date.now();
+  const body = JSON.stringify(snapshot());
+  if (storageWorks){
+    try{
+      const current = readRaw(LS_KEY);
+      if (current && current !== body) localStorage.setItem(PREV_KEY, current);
+      localStorage.setItem(LS_KEY, body);
+      saveHealthy = readRaw(LS_KEY) === body;
+    }catch(e){
+      saveHealthy = false;
+      try{                                    // out of room: drop the rolling copy and retry
+        localStorage.removeItem(PREV_KEY);
+        localStorage.setItem(LS_KEY, body);
+        saveHealthy = readRaw(LS_KEY) === body;
+      }catch(e2){}
+    }
+  } else saveHealthy = false;
+  idbSave(body);
+  showHealth();
+}
+
+function askForPersistence(){
+  if (!navigator.storage || !navigator.storage.persist) return;
+  navigator.storage.persisted().then(already=>{
+    if (already){ state.persisted = true; return; }
+    navigator.storage.persist().then(granted=>{ state.persisted = granted; }).catch(()=>{});
+  }).catch(()=>{});
+}
+
+function showHealth(){
+  const existing = document.getElementById("healthBanner");
+  if (saveHealthy){ if (existing) existing.remove(); return; }
+  if (existing) return;
+  const b = el("div","banner");
+  b.id = "healthBanner";
+  b.textContent = "This phone isn't keeping your log — private browsing or a storage setting is blocking it. What you type now will be lost when you close the app.";
+  main.insertBefore(b, main.firstChild);
 }
 
 const key = (w,d) => "w" + String(w).padStart(2,"0") + "-" + d;
@@ -433,15 +537,12 @@ function push(k){
   // No server: the log lives in this browser, on this phone.
   delete state.dirty[k];
   saveLocal();
-  setSync(storageWorks ? "ok" : "local", storageWorks ? "Saved on this phone" : "This browser is blocking storage");
+  setSync(saveHealthy ? "ok" : "local", saveHealthy ? "Saved on this phone" : "Not saving — storage is blocked");
 }
 function flushDirty(){ Object.keys(state.dirty).forEach(push); }
 
 function pushSettings(){ saveLocal(); }
 
-let storageWorks = true;
-try{ localStorage.setItem("gfo-probe","1"); localStorage.removeItem("gfo-probe"); }
-catch(e){ storageWorks = false; }
 let syncEl = null;
 function setSync(kind, text){
   state.dbState = kind;
@@ -452,7 +553,7 @@ function setSync(kind, text){
     syncEl.lastChild.textContent = text;
   }
 }
-setSync(storageWorks ? "ok" : "local", storageWorks ? "Saved on this phone" : "Storage is blocked in this browser");
+setSync("ok","Saved on this phone");
 
 /* No account and no server: everything stays in this browser, on this device. */
 
@@ -579,10 +680,16 @@ function notesBlock(w,d){
   ta.placeholder = "How it felt, anything to remember for next week…";
   ta.value = session(w,d).notes || "";
   let t;
+  const commit = ()=>{
+    clearTimeout(t); state.pendingNotes = null;
+    touch(w,d, s=>{ s.notes = ta.value; });
+  };
   ta.addEventListener("input", ()=>{
+    state.pendingNotes = commit;
     clearTimeout(t);
-    t = setTimeout(()=> touch(w,d, s=>{ s.notes = ta.value; }), 500);
+    t = setTimeout(commit, 600);
   });
+  ta.addEventListener("blur", ()=>{ if (state.pendingNotes) commit(); });
   card.appendChild(ta);
   return card;
 }
@@ -948,6 +1055,34 @@ function doExport(){
   toast("Exported - check your downloads");
 }
 
+function doBackup(){
+  const body = JSON.stringify(snapshot(), null, 1);
+  const url = URL.createObjectURL(new Blob([body], {type:"application/json"}));
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "gymming-for-olives-" + new Date().toISOString().slice(0,10) + ".json";
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(function(){ URL.revokeObjectURL(url); }, 4000);
+  state.settings.lastBackup = Date.now(); saveLocal();
+  toast("Backup saved - keep it in Drive or email it to yourself");
+}
+function restoreBackup(text){
+  const snap = parseSnap(text);
+  if (!snap) return null;
+  const before = Object.keys(state.sessions).length;
+  const changed = mergeSnap(snap);
+  if (changed) saveLocal();
+  return {changed, added: Object.keys(state.sessions).length - before, total: Object.keys(snap.sessions).length};
+}
+function backupAge(){
+  const last = state.settings.lastBackup;
+  const logged = Object.keys(state.sessions).filter(k=>hasData(state.sessions[k])).length;
+  if (!logged) return null;
+  if (!last) return {stale:true, text:"Never backed up"};
+  const days = Math.floor((Date.now()-last)/864e5);
+  return {stale: days >= 14, text: days === 0 ? "Backed up today" : "Backed up " + days + " day" + (days===1?"":"s") + " ago"};
+}
+
 function normName(s){ return String(s||"").toLowerCase().replace(/[^a-z0-9]/g,""); }
 function dayOfSheet(name){
   const n = normName(name);
@@ -1034,12 +1169,74 @@ function renderData(){
   setSync(state.dbState, state.syncText);
   sync.appendChild(syncEl);
   const logged = Object.keys(state.sessions).filter(function(k){ return hasData(state.sessions[k]); }).length;
-  const last = state.settings.lastExport;
-  sync.appendChild(el("div","help", storageWorks
-    ? logged + " session" + (logged === 1 ? "" : "s") + " saved in this browser, on this phone. Nothing is sent anywhere and it works with no signal. "
-      + (last ? "Last export " + new Date(last).toLocaleDateString() + "." : "Export to Excel now and then, so you have a backup.")
-    : "This browser is blocking storage, so your log can't be kept. Turn off private browsing, or allow site data, then reload."));
+  sync.appendChild(el("div","help", saveHealthy
+    ? logged + " session" + (logged === 1 ? "" : "s") + " saved on this phone, in two places in the browser. Nothing is sent anywhere and it works with no signal."
+    : "This browser is blocking storage, so your log can't be kept. Turn off private browsing, or allow site data for this page, then reload."));
+
+  const prot = el("div","field");
+  prot.style.marginTop = "8px";
+  const protText = el("div","help");
+  prot.appendChild(protText);
+  sync.appendChild(prot);
+  if (navigator.storage && navigator.storage.persisted){
+    navigator.storage.persisted().then(function(p){
+      protText.textContent = p
+        ? "Protected: the browser won't clear this app's data to free up space."
+        : "Not yet protected from the browser clearing space. Tap to fix.";
+      if (!p){
+        const btn = el("button","btn","Protect my log");
+        btn.style.marginTop = "8px";
+        btn.addEventListener("click", function(){
+          navigator.storage.persist().then(function(g){
+            toast(g ? "Protected" : "The browser said no - install to the home screen, then try again");
+            render();
+          }).catch(function(){ toast("Couldn't ask this browser"); });
+        });
+        sync.appendChild(btn);
+      }
+    }).catch(function(){});
+  }
+  if (navigator.storage && navigator.storage.estimate){
+    navigator.storage.estimate().then(function(e){
+      if (!e || !e.usage) return;
+      const kb = Math.max(1, Math.round(e.usage/1024));
+      protText.textContent = protText.textContent + " Using about " + kb + " KB.";
+    }).catch(function(){});
+  }
   main.appendChild(sync);
+
+  const bk = el("div","card pad");
+  const bkHead = el("div","eyebrow","Backup");
+  bk.appendChild(bkHead);
+  const age = backupAge();
+  if (age){
+    const chip = el("div", age.stale ? "warnchip" : "help", age.text);
+    chip.style.marginBottom = "6px";
+    bk.appendChild(chip);
+  }
+  const bkRow = el("div","row2");
+  const bkBtn = el("button","btn primary","Back up now");
+  bkBtn.addEventListener("click", doBackup);
+  const rsBtn = el("button","btn","Restore");
+  const bkFile = document.createElement("input");
+  bkFile.type = "file"; bkFile.accept = ".json,application/json"; bkFile.hidden = true; bkFile.id = "backupFile";
+  rsBtn.addEventListener("click", function(){ bkFile.click(); });
+  bkFile.addEventListener("change", function(){
+    const f = bkFile.files && bkFile.files[0];
+    if (!f) return;
+    f.text().then(function(txt){
+      const res = restoreBackup(txt);
+      if (!res){ toast("That doesn't look like a backup file"); return; }
+      render();
+      toast(res.changed ? "Restored " + res.total + " session" + (res.total === 1 ? "" : "s") : "Backup was already up to date");
+    }).catch(function(){ toast("Couldn't read that file"); });
+    bkFile.value = "";
+  });
+  bkRow.appendChild(bkBtn); bkRow.appendChild(rsBtn);
+  bk.appendChild(bkRow);
+  bk.appendChild(bkFile);
+  bk.appendChild(el("div","help","A small .json file with everything in it. Save it to Drive or email it to yourself — it's the only copy that survives losing the phone. Restore reads it back on any phone."));
+  main.appendChild(bk);
 
   const io = el("div","card pad");
   io.appendChild(el("div","eyebrow","Spreadsheet"));
@@ -1137,16 +1334,33 @@ document.getElementById("wkNext").addEventListener("click", ()=>{ state.week = M
 document.getElementById("tabSession").addEventListener("click", ()=>{ state.view = "session"; render(); });
 document.getElementById("tabProgress").addEventListener("click", ()=>{ state.view = "progress"; render(); });
 document.getElementById("tabData").addEventListener("click", ()=>{ state.view = "data"; render(); });
-document.addEventListener("visibilitychange", ()=>{ if (!document.hidden) flushDirty(); });
+document.addEventListener("visibilitychange", ()=>{
+  if (document.hidden){ if (state.pendingNotes) state.pendingNotes(); }
+  else flushDirty();
+});
 
 if ("serviceWorker" in navigator){
   window.addEventListener("load", function(){ navigator.serviceWorker.register("./sw.js").catch(function(){}); });
 }
 
+window.addEventListener("pagehide", ()=>{ if (state.pendingNotes) state.pendingNotes(); });
+
 loadLocal();
 state.week = currentWeek();
 state.day = todayDay();
 render();
+askForPersistence();
+
+// Second copy: if localStorage came back empty or behind, restore from IndexedDB.
+idbLoad().then(snap=>{
+  if (!snap) return;
+  const wasEmpty = Object.keys(state.sessions).length === 0;
+  if (mergeSnap(snap)){
+    saveLocal();
+    render();
+    if (wasEmpty) toast("Restored your log from this phone's backup copy");
+  }
+});
 })();
 </script>
 

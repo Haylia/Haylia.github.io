@@ -1,6 +1,6 @@
 /* Gymming for Olives — offline cache.
    Bump CACHE when index.html changes, so phones pick up the new version. */
-const CACHE = "gfo-v1";
+const CACHE = "gfo-v2";
 
 const CORE = [
   "./",
