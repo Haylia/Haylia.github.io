@@ -46,13 +46,13 @@ regtech or KYC-engineering role.
   dates: dates-helper(start-date: "Jul 2025", end-date: "Present"),
 )
 - Review and respond to inbound KYC requests for complex private-equity structures in a fast-paced environment, often handling many clients at once.
-- Assess banks' requirements against market standard, scoping each response to the genuine requirement and pushing back on off-market or excessive asks (e.g. source of funds), while keeping clients satisfied.
+- Assess banks' requirements against market standard, scoping each response to the genuine requirement and pushing back on off-market or excessive asks while keeping clients satisfied.
 - Built internal tracking tools, including a Python program that replaced a manual reporting process, to support team performance monitoring and assessment.
 - Trained new team members and handled high-volume clients with minimal supervision.
-- Early adopter of the firm's bespoke AI-backed workflow tool, working with the internal engineering team.
+- Early adopter and ongoing member of the power-user group for the firm's bespoke AI-backed workflow tool, which has grown from an early pilot into a full replacement for the previous KYC workflow. Use it for day-to-day KYC delivery and feed back to the internal engineering team as it evolves.
 
 #work(
-  title: "Programmer & Content Creator",
+  title: "Programmer & Content Builder",
   location: "Indie game project",
   company: "Wardens",
   dates: dates-helper(start-date: "Mar 2023", end-date: "Present"),
