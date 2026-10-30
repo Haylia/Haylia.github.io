@@ -27,6 +27,21 @@ site it is public to anyone who knows the address.
 The first load fetches the fonts and the spreadsheet library and then keeps them,
 so after that it opens with no signal.
 
+## Changing a session on the day
+
+On the phone, in a session:
+
+- **Swap** on any exercise — offers that exercise's `alternatives` from the plan,
+  then the rest of the plan, then anything you've swapped in before, then
+  "Something else…" for a name you type.
+- **Skip today** on the same menu, for when a machine is taken.
+- **+ Add an exercise** at the bottom of the list, for something extra you did.
+
+These change that session only; the next week starts from the plan again. What
+you log is filed under the new exercise's own key, so charts never splice two
+different movements together, and doing the same swap again next week picks up
+its own history ("last week: 60kg × 4 × 6").
+
 ## Changing the plan
 
 Edit `plan.js`, commit, push. Both phones pick it up next time they open the app

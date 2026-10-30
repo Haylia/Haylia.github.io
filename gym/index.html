@@ -137,6 +137,49 @@
   details.tip summary::after{content:"▾"; font-size:10px}
   details.tip[open] summary::after{content:"▴"}
   details.tip p{margin:6px 0 0; font-size:13px; color:var(--ink-2)}
+  .ex-foot{display:flex; align-items:center; justify-content:space-between; gap:12px; margin-top:9px}
+  .ex-foot details.tip{margin-top:0}
+  .ex-sub{font-size:12px; color:var(--muted); margin-top:3px}
+  .linkbtn{appearance:none; border:0; background:transparent; color:var(--accent); font:inherit; font-size:12.5px; cursor:pointer; padding:4px 0; white-space:nowrap}
+  .skipped{display:flex; align-items:center; gap:10px; padding:11px 14px; border-bottom:1px solid var(--line); font-size:13.5px; color:var(--muted)}
+  .skipped:last-child{border-bottom:0}
+  .skipped b{font-family:"Barlow Condensed",sans-serif; font-weight:600; font-size:16px; color:var(--ink-2)}
+  .addbtn{
+    appearance:none; width:100%; cursor:pointer; border:1px dashed var(--line-strong); background:transparent;
+    color:var(--accent); border-radius:12px; padding:12px; font:inherit; font-weight:600; font-size:14px;
+  }
+  .sheet-back{
+    position:fixed; inset:0; background:rgba(8,13,17,.55); z-index:50;
+    display:flex; align-items:flex-end; justify-content:center;
+  }
+  .sheet{
+    background:var(--surface); width:100%; max-width:720px; border-radius:16px 16px 0 0;
+    padding:14px 16px calc(16px + env(safe-area-inset-bottom,0px));
+    max-height:84vh; overflow-y:auto; box-shadow:var(--shadow);
+  }
+  .sheet-head{display:flex; align-items:baseline; gap:10px; margin-bottom:2px}
+  .sheet-head h2{font-size:21px; font-family:"Barlow Condensed",sans-serif; text-transform:uppercase; letter-spacing:.02em}
+  .sheet-head .linkbtn{margin-left:auto}
+  .opt{
+    display:block; width:100%; text-align:left; cursor:pointer; font:inherit;
+    border:1px solid var(--line); background:var(--surface-2); color:var(--ink);
+    border-radius:11px; padding:10px 12px; margin-top:8px;
+  }
+  .opt b{font-family:"Barlow Condensed",sans-serif; font-weight:600; font-size:17px}
+  .opt small{display:block; color:var(--muted); font-size:11.5px; margin-top:1px}
+  .opt.quiet{background:transparent; border-style:dashed; color:var(--accent)}
+  .chips{display:flex; gap:6px; margin-top:6px; flex-wrap:wrap}
+  .chipbtn{
+    appearance:none; cursor:pointer; font:inherit; font-size:13px; border-radius:999px; padding:7px 12px;
+    border:1px solid var(--line-strong); background:var(--field); color:var(--ink-2);
+  }
+  .chipbtn[aria-pressed="true"]{background:var(--accent); border-color:var(--accent); color:#fff}
+  .sheet .fld{margin-top:10px}
+  .sheet .fld label{display:block; font-size:10.5px; text-transform:uppercase; letter-spacing:.07em; color:var(--muted); margin-bottom:3px}
+  .sheet input[type="text"], .sheet input[type="number"]{
+    width:100%; border:1px solid var(--line); background:var(--field); color:var(--ink);
+    border-radius:10px; padding:10px; font:inherit;
+  }
   .rest{color:var(--muted); font-size:12px}
 
   .list{display:flex; flex-direction:column; gap:9px; margin:0; padding:0; list-style:none}
@@ -255,7 +298,7 @@ Object.keys(CFG.days).forEach(id=>{
       k: e.key, n: e.name || e.key, target: e.target || "", sets: e.sets || 3,
       hi: e.topReps || 10, start: kind === "bw" ? undefined : e.startKg,
       step: e.stepKg || 2.5, kind, rl: e.unit || "Reps", rest: e.rest || "",
-      tip: e.how || "", tile: !!e.tile
+      tip: e.how || "", tile: !!e.tile, alternatives: e.alternatives || []
     };
   });
   PLAN[id] = {
@@ -516,21 +559,23 @@ setSync("ok","Saved on this phone");
 /* ----------------------------------------------------------- derivations */
 function entryOf(w,d,k){ return (session(w,d).entries||{})[k] || {}; }
 
-function historyOf(day, exKey){         // [{week, kg, sets, reps}] oldest first
-  const out = [];
-  for (let w=1; w<=MAX_WEEK; w++){
-    const e = entryOf(w,day,exKey);
-    const kg = num(e.kg), reps = num(e.reps), sets = num(e.sets);
-    if (kg !== null || reps !== null) out.push({week:w, kg, sets, reps});
+function historyOf(exKey){             // [{week, day, kg, sets, reps}] oldest first
+  const out = [];                      // keyed on the exercise, so a lift done on
+  for (let w=1; w<=MAX_WEEK; w++){     // an off day still counts towards it
+    DAYS.forEach(d=>{
+      const e = entryOf(w,d,exKey);
+      const kg = num(e.kg), reps = num(e.reps), sets = num(e.sets);
+      if (kg !== null || reps !== null) out.push({week:w, day:d, kg, sets, reps});
+    });
   }
   return out;
 }
-function lastBefore(day, exKey, week){
-  const h = historyOf(day, exKey).filter(r=>r.week < week);
+function lastBefore(exKey, week){
+  const h = historyOf(exKey).filter(r=>r.week < week);
   return h.length ? h[h.length-1] : null;
 }
 function suggestion(ex, day, week){
-  const prev = lastBefore(day, ex.k, week);
+  const prev = lastBefore(ex.k, week);
   if (!prev) return {kg: ex.start ?? null, why:"start"};
   if (ex.kind === "bw") return {kg:null, why:""};
   const hitTop = prev.reps !== null && prev.reps >= ex.hi && (prev.sets === null || prev.sets >= ex.sets);
@@ -651,10 +696,218 @@ function notesBlock(w,d){
   return card;
 }
 
-function exerciseCard(ex, w, d){
+/* ------------------------------------------- swapping, adding and skipping
+   A change applies to that one session. Next week starts from the plan again,
+   and anything logged is filed under the exercise's own key, so the charts
+   never splice two different movements together. */
+function slugKey(name){
+  const base = String(name||"").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,"").slice(0,28);
+  return "x-" + (base || "exercise");
+}
+function swapOf(w,d,k){ return (session(w,d).swaps || {})[k] || null; }
+function isSkipped(w,d,k){ return !!(session(w,d).skipped || {})[k]; }
+function extrasOf(w,d){ return session(w,d).extras || []; }
+
+function makeDef(picked){
+  const kind = picked.kind || "kg";
+  const name = picked.name || picked.n || "Exercise";
+  return {
+    k: picked.k || slugKey(name),
+    n: name,
+    target: picked.target || (kind === "bw" ? "3 × 8–12" : "3 × 8–10"),
+    sets: picked.sets || 3,
+    hi: picked.hi || picked.topReps || (kind === "bw" ? 12 : 10),
+    start: kind === "bw" ? undefined : picked.start,
+    step: picked.step || (kind === "bw" ? 1 : 2.5),
+    kind,
+    rl: picked.rl || "Reps",
+    rest: picked.rest || "Rest 90 s",
+    tip: picked.tip || "Swapped in on the day. The plan is unchanged — next week goes back to it.",
+    custom: true
+  };
+}
+function rememberName(def, d){
+  state.settings.exNames = state.settings.exNames || {};
+  state.settings.exNames[def.k] = def.n;
+  state.settings.exDays = state.settings.exDays || {};
+  state.settings.exDays[def.k] = d;
+  saveLocal();
+}
+function applySwap(w,d,origKey,def){
+  touch(w,d, s=>{
+    s.swaps = Object.assign({}, s.swaps); s.swaps[origKey] = def;
+    if (s.skipped) { s.skipped = Object.assign({}, s.skipped); delete s.skipped[origKey]; }
+  });
+  rememberName(def, d);
+}
+function clearSwap(w,d,origKey){
+  touch(w,d, s=>{ s.swaps = Object.assign({}, s.swaps); delete s.swaps[origKey]; });
+}
+function setSkipped(w,d,k,v){
+  touch(w,d, s=>{
+    s.skipped = Object.assign({}, s.skipped);
+    if (v) s.skipped[k] = 1; else delete s.skipped[k];
+  });
+}
+function addExtra(w,d,def){
+  touch(w,d, s=>{ s.extras = (s.extras || []).concat([def]); });
+  rememberName(def, d);
+}
+function removeExtra(w,d,k){
+  touch(w,d, s=>{
+    s.extras = (s.extras || []).filter(x=>x.k !== k);
+    if (s.entries) { s.entries = Object.assign({}, s.entries); delete s.entries[k]; }
+  });
+}
+
+/* Everything on offer in the picker: the plan's own alternatives for that slot,
+   the rest of the plan, and anything swapped or added before. */
+function pickerOptions(w, d, planEx){
+  const out = [], seen = {};
+  const push = o => {
+    const k = o.k || slugKey(o.name);
+    if (seen[k]) return;
+    seen[k] = true; out.push(Object.assign({}, o, {k}));
+  };
+  if (planEx){
+    (planEx.alternatives || []).forEach(name => push({
+      name, kind:planEx.kind, start:planEx.start, step:planEx.step,
+      sets:planEx.sets, hi:planEx.hi, target:planEx.target, rest:planEx.rest, rl:planEx.rl,
+      note:"instead of " + planEx.n
+    }));
+  }
+  const inSession = {};
+  (PLAN[d].ex || []).forEach(ex=>{ inSession[ex.k] = true; });
+  extrasOf(w,d).forEach(x=>{ inSession[x.k] = true; });
+  DAYS.forEach(day => (PLAN[day].ex || []).forEach(ex=>{
+    if (planEx && ex.k === planEx.k) return;
+    if (!planEx && inSession[ex.k]) return;
+    (ex.alternatives || []).forEach(name => push({
+      name, kind:ex.kind, start:ex.start, step:ex.step, sets:ex.sets, hi:ex.hi,
+      target:ex.target, rest:ex.rest, rl:ex.rl, note:"alternative to " + ex.n
+    }));
+    push({
+      k:ex.k, name:ex.n, kind:ex.kind, start:ex.start, step:ex.step, sets:ex.sets, hi:ex.hi,
+      target:ex.target, rest:ex.rest, rl:ex.rl, tip:ex.tip, note:"from " + PLAN[day].label
+    });
+  }));
+  const names = state.settings.exNames || {};
+  Object.keys(names).forEach(k=>{
+    if (k.indexOf("x-") !== 0) return;
+    push({k, name:names[k], kind:"kg", note:"you've logged this before"});
+  });
+  return out;
+}
+
+function openPicker(opts){
+  const back = el("div","sheet-back");
+  const sheet = el("div","sheet");
+  const head = el("div","sheet-head");
+  head.appendChild(el("h2", null, opts.title));
+  const close = el("button","linkbtn","Close");
+  close.addEventListener("click", ()=> back.remove());
+  head.appendChild(close);
+  sheet.appendChild(head);
+  if (opts.subtitle) sheet.appendChild(el("div","help", opts.subtitle));
+
+  (opts.extraActions || []).forEach(a=>{
+    const b = el("button","opt quiet");
+    b.appendChild(el("b", null, a.label));
+    if (a.note) b.appendChild(el("small", null, a.note));
+    b.addEventListener("click", ()=>{ back.remove(); a.run(); });
+    sheet.appendChild(b);
+  });
+
+  (opts.options || []).forEach(o=>{
+    const b = el("button","opt");
+    b.appendChild(el("b", null, o.name));
+    const bits = [];
+    if (o.note) bits.push(o.note);
+    if (o.kind === "assist") bits.push("assisted — lower kg is better");
+    if (o.kind === "bw") bits.push("bodyweight");
+    if (bits.length) b.appendChild(el("small", null, bits.join(" · ")));
+    b.addEventListener("click", ()=>{ back.remove(); opts.onPick(makeDef(o)); });
+    sheet.appendChild(b);
+  });
+
+  const own = el("button","opt quiet");
+  own.appendChild(el("b", null, "Something else…"));
+  own.appendChild(el("small", null, "type whatever you did"));
+  sheet.appendChild(own);
+
+  const form = el("div");
+  form.hidden = true;
+  const nf = el("div","fld");
+  nf.appendChild(el("label", null, "Exercise"));
+  const nameIn = document.createElement("input");
+  nameIn.type = "text"; nameIn.id = "pickName"; nameIn.placeholder = "Hack squat";
+  nameIn.autocomplete = "off";
+  nf.appendChild(nameIn);
+  form.appendChild(nf);
+
+  const tf = el("div","fld");
+  tf.appendChild(el("label", null, "Type"));
+  const chips = el("div","chips");
+  let kind = "kg";
+  [["kg","Weights"],["bw","Bodyweight"],["assist","Assisted"]].forEach(([val,label])=>{
+    const c = el("button","chipbtn",label);
+    c.type = "button";
+    c.setAttribute("aria-pressed", String(val === kind));
+    c.addEventListener("click", ()=>{
+      kind = val;
+      Array.prototype.forEach.call(chips.children, x=> x.setAttribute("aria-pressed", String(x === c)));
+    });
+    chips.appendChild(c);
+  });
+  tf.appendChild(chips);
+  form.appendChild(tf);
+
+  const kf = el("div","fld");
+  kf.appendChild(el("label", null, "Starting kg (optional)"));
+  const kgIn = document.createElement("input");
+  kgIn.type = "number"; kgIn.id = "pickKg"; kgIn.inputMode = "decimal"; kgIn.placeholder = "20";
+  kf.appendChild(kgIn);
+  form.appendChild(kf);
+
+  const go = el("button","btn primary","Add it");
+  go.style.marginTop = "12px";
+  go.addEventListener("click", ()=>{
+    const name = nameIn.value.trim();
+    if (!name){ nameIn.focus(); return; }
+    back.remove();
+    opts.onPick(makeDef({name, kind, start: num(kgIn.value) === null ? undefined : num(kgIn.value)}));
+  });
+  form.appendChild(go);
+  sheet.appendChild(form);
+
+  own.addEventListener("click", ()=>{
+    form.hidden = false; own.hidden = true; nameIn.focus();
+  });
+
+  back.addEventListener("click", e=>{ if (e.target === back) back.remove(); });
+  back.appendChild(sheet);
+  document.body.appendChild(back);
+}
+
+function skippedRow(ex, w, d){
+  const row = el("div","skipped");
+  row.appendChild(el("b", null, ex.n));
+  row.appendChild(el("span", null, "skipped today"));
+  const undo = el("button","linkbtn","Undo");
+  undo.style.marginLeft = "auto";
+  undo.addEventListener("click", ()=>{ setSkipped(w,d,ex.k,false); render(); });
+  row.appendChild(undo);
+  return row;
+}
+
+function exerciseCard(ex, w, d, planEx){
   const box = el("div","ex");
   const top = el("div","ex-top");
-  top.appendChild(el("div","ex-name",ex.n));
+  const nameBox = el("div");
+  nameBox.appendChild(el("div","ex-name",ex.n));
+  if (planEx && planEx.k !== ex.k) nameBox.appendChild(el("div","ex-sub","instead of " + planEx.n));
+  else if (ex.custom) nameBox.appendChild(el("div","ex-sub","added today"));
+  top.appendChild(nameBox);
   top.appendChild(el("div","ex-target",ex.target));
   box.appendChild(top);
 
@@ -695,10 +948,37 @@ function exerciseCard(ex, w, d){
   steps.appendChild(stepper(ex.rl || "Reps", num(e.reps), {id:key(w,d)+"-"+ex.k+"-reps", step: ex.rl === "Secs" ? 5 : 1, placeholder:ex.hi}, v=>{ save("reps", v); refreshChips(); }));
   box.appendChild(steps);
 
+  const foot = el("div","ex-foot");
   const det = el("details","tip");
   det.appendChild(el("summary", null, "How to do it"));
   det.appendChild(el("p", null, ex.tip));
-  box.appendChild(det);
+  foot.appendChild(det);
+
+  const change = el("button","linkbtn", planEx ? "Swap" : "Change");
+  change.addEventListener("click", ()=>{
+    const slotKey = planEx ? planEx.k : ex.k;
+    const actions = [];
+    if (planEx && planEx.k !== ex.k){
+      actions.push({label:"Back to " + planEx.n, note:"undo the swap — anything logged against " + ex.n + " is kept",
+                    run:()=>{ clearSwap(w,d,slotKey); render(); }});
+    }
+    if (planEx){
+      actions.push({label:"Skip today", note:"machine busy, or not feeling it",
+                    run:()=>{ setSkipped(w,d,slotKey,true); render(); }});
+    } else {
+      actions.push({label:"Remove from today", note:"deletes what you logged for it",
+                    run:()=>{ removeExtra(w,d,ex.k); render(); }});
+    }
+    openPicker({
+      title: planEx ? "Swap " + planEx.n : "Change " + ex.n,
+      subtitle: "Today only. Next week goes back to the plan.",
+      options: pickerOptions(w, d, planEx || ex),
+      extraActions: actions,
+      onPick: def => { if (planEx) applySwap(w,d,slotKey,def); else { removeExtra(w,d,ex.k); addExtra(w,d,def); } render(); }
+    });
+  });
+  foot.appendChild(change);
+  box.appendChild(foot);
   return box;
 }
 function refreshChips(){ markDayDots(); }
@@ -759,8 +1039,23 @@ function renderSession(){
     main.appendChild(runCard(w));
   } else {
     const card = el("div","card");
-    p.ex.forEach(ex => card.appendChild(exerciseCard(ex, w, d)));
+    p.ex.forEach(ex=>{
+      if (isSkipped(w,d,ex.k)) { card.appendChild(skippedRow(ex, w, d)); return; }
+      const sw = swapOf(w,d,ex.k);
+      card.appendChild(exerciseCard(sw || ex, w, d, ex));
+    });
+    extrasOf(w,d).forEach(x => card.appendChild(exerciseCard(x, w, d, null)));
     main.appendChild(card);
+
+    const add = el("button","addbtn","+  Add an exercise");
+    add.addEventListener("click", ()=> openPicker({
+      title: "Add an exercise",
+      subtitle: "Something extra you did today. Today only.",
+      options: pickerOptions(w, d, null),
+      onPick: def => { addExtra(w,d,def); render(); }
+    }));
+    main.appendChild(add);
+
     const fin = el("div","card pad");
     fin.appendChild(el("div","eyebrow","Cardio finisher · "+p.finish[0]));
     fin.appendChild(el("div", null, p.finish[1]));
@@ -871,7 +1166,7 @@ function renderProgress(){
   }
   // Tiles come from `tile: true` in plan.js, so changing the plan changes these.
   lifts.filter(l=>l.ex.tile && l.ex.kind !== "assist").slice(0,3).forEach(({day, ex})=>{
-    const h = historyOf(day, ex.k).filter(r=>r.kg !== null);
+    const h = historyOf(ex.k).filter(r=>r.kg !== null);
     const best = h.length ? Math.max.apply(null, h.map(r=>r.kg)) : null;
     tiles.appendChild(tile("Best " + ex.n.toLowerCase(), best === null ? "—" : best + " kg",
       ex.start === undefined ? PLAN[day].short : "start " + ex.start + " kg"));
@@ -880,7 +1175,7 @@ function renderProgress(){
 
   // Any assisted machine counts down to zero — the plan says which, not the app.
   lifts.filter(l=>l.ex.kind === "assist").forEach(({day, ex})=>{
-    const h = historyOf(day, ex.k).filter(r=>r.kg !== null);
+    const h = historyOf(ex.k).filter(r=>r.kg !== null);
     const now = h.length ? Math.min.apply(null, h.map(r=>r.kg)) : null;
     const startKg = ex.start || 0;
     const pct = (now === null || !startKg) ? 0 : Math.max(0, Math.min(1, (startKg - now)/startKg));
@@ -904,7 +1199,7 @@ function renderProgress(){
   const liftCard = el("div","card");
   let any = false;
   lifts.forEach(({day, ex})=>{
-    const h = historyOf(day, ex.k).filter(r=>r.kg !== null);
+    const h = historyOf(ex.k).filter(r=>r.kg !== null);
     if (!h.length) return;
     any = true;
     const box = el("div","lift");
@@ -960,7 +1255,7 @@ function renderProgress(){
   });
   const pastKeys = Object.keys(past);
   if (pastKeys.length){
-    const head = el("div","eyebrow","Past exercises");
+    const head = el("div","eyebrow","Other exercises");
     head.style.padding = "12px 14px 0";
     main.appendChild(head);
     const card = el("div","card");
@@ -976,7 +1271,8 @@ function renderProgress(){
         top.appendChild(b);
       }
       box.appendChild(top);
-      box.appendChild(el("div","sub","No longer in the plan · " + rows.length + " session" + (rows.length===1?"":"s") +
+      box.appendChild(el("div","sub",(k.indexOf("x-") === 0 ? "Added on the day" : "No longer in the plan") +
+        " · " + rows.length + " session" + (rows.length===1?"":"s") +
         " · weeks " + rows[0].week + "–" + rows[rows.length-1].week));
       if (withKg.length > 1){
         box.appendChild(lineChart(withKg.map(r=>({x:r.week, y:r.kg})), {color:"var(--muted)", unit:"kg", label:((state.settings.exNames||{})[k] || k) + " weight by week"}));
@@ -1016,8 +1312,22 @@ function buildWorkbook(){
   const wb = XLSX.utils.book_new();
   WEIGHT_DAYS.forEach(d=>{
     const p = PLAN[d];
+    // anything swapped or added on this day gets its own columns, so nothing is lost
+    const planKeys = {};
+    p.ex.forEach(ex=>{ planKeys[ex.k] = true; });
+    const extraCols = [];
+    for (let w=1; w<=MAX_WEEK; w++){
+      const s = session(w,d);
+      Object.keys(s.entries || {}).forEach(k=>{
+        if (k === "run" || planKeys[k] || extraCols.some(x=>x.k === k)) return;
+        const e = s.entries[k];
+        if (num(e.kg) === null && num(e.sets) === null && num(e.reps) === null) return;
+        extraCols.push({k, n:(state.settings.exNames || {})[k] || k, kind:"kg", rl:"Reps"});
+      });
+    }
+    const cols = p.ex.concat(extraCols);
     const row1 = ["Week","Date","Week type"], row2 = ["","",""];
-    p.ex.forEach(ex=>{
+    cols.forEach(ex=>{
       row1.push(ex.n, "", "");
       row2.push(ex.kind === "assist" ? "Assist kg" : ex.kind === "bw" ? "—" : "kg", "Sets", ex.rl || "Reps");
     });
@@ -1027,7 +1337,7 @@ function buildWorkbook(){
       const s = session(w,d);
       if (!hasData(s)) continue;
       const r = [w, fmtDate(sessionDate(w,d)), isDeload(w) ? "Deload" : ""];
-      p.ex.forEach(ex=>{
+      cols.forEach(ex=>{
         const e = (s.entries||{})[ex.k] || {};
         r.push(num(e.kg) ?? "", num(e.sets) ?? "", num(e.reps) ?? "");
       });

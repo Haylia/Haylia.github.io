@@ -36,6 +36,10 @@
      stepKg    what the +/- buttons add and take off
      tile      true puts a best-ever tile on the Progress screen. Keep it to
                two or three, or the screen gets busy.
+     alternatives
+               names offered first when you tap Swap on the phone, for the days
+               the machine is taken or your back says no. Swapping on the phone
+               changes that session only and never edits this file.
      colour    one of: --mon (blue), --tue (violet), --thu (green),
                --fri (orange), --alt1 (teal), --alt2 (pink)
    ========================================================================= */
@@ -61,13 +65,17 @@ window.GYM_PLAN = {
       mobility: { time: "2 min",   how: "10 leg swings each way (front–back and side–side) + 10 bodyweight squats. Dynamic moves only." },
       exercises: [
         { key:"squat", name:"Back Squat", type:"weights", target:"4 × 6–8", sets:4, topReps:8, startKg:55, stepKg:2.5, rest:"Rest 2–3 min", tile:true,
-          how:"Warm-up sets first: empty bar ×10, 30kg ×5, 45kg ×3. Brace your core, hips back and down to at least parallel, drive up through mid-foot." },
+          how:"Warm-up sets first: empty bar ×10, 30kg ×5, 45kg ×3. Brace your core, hips back and down to at least parallel, drive up through mid-foot.",
+          alternatives:["Hack Squat","Goblet Squat","Front Squat","Leg Press"] },
         { key:"rdl", name:"Romanian Deadlift", type:"weights", target:"3 × 8–10", sets:3, topReps:10, startKg:40, stepKg:2.5, rest:"Rest 2 min",
-          how:"Soft knees, push hips back, bar slides close down your thighs, stop at a strong hamstring stretch. Flat back throughout." },
+          how:"Soft knees, push hips back, bar slides close down your thighs, stop at a strong hamstring stretch. Flat back throughout.",
+          alternatives:["Good Morning","Seated Leg Curl","Cable Pull-through","Single-leg RDL"] },
         { key:"lunge", name:"DB Walking Lunge", type:"weights", target:"3 × 10–12 each leg", sets:3, topReps:12, startKg:8, stepKg:1, rest:"Rest 90 s",
-          how:"kg is per dumbbell. Long stride, back knee almost touches the floor, stay tall. Log reps per leg." },
+          how:"kg is per dumbbell. Long stride, back knee almost touches the floor, stay tall. Log reps per leg.",
+          alternatives:["Reverse Lunge","Step-up","Split Squat"] },
         { key:"legpress", name:"Leg Press", type:"weights", target:"3 × 10–12", sets:3, topReps:12, startKg:60, stepKg:5, rest:"Rest 90 s",
-          how:"Pick a load that leaves about 2 reps in the tank. Feet shoulder-width, don't lock your knees at the top." },
+          how:"Pick a load that leaves about 2 reps in the tank. Feet shoulder-width, don't lock your knees at the top.",
+          alternatives:["Hack Squat","Goblet Squat","Leg Extension"] },
         { key:"deadbug", name:"Dead Bug", type:"bodyweight", target:"3 × 8–12 each side", sets:3, topReps:12, rest:"Core · rest 45 s",
           how:"Lie on your back, arms up, knees at 90°. Lower opposite arm and leg slowly, keeping your lower back pressed into the floor." }
       ],
@@ -90,17 +98,23 @@ window.GYM_PLAN = {
       mobility: { time:"2 min",   how:"10 arm circles each way + 10 band pull-aparts + 5 slow scapular pull-ups hanging from the bar." },
       exercises: [
         { key:"pullup", name:"Assisted Pull-up", type:"assisted", target:"3 × 6–8", sets:3, topReps:8, startKg:50, stepKg:2.5, rest:"Rest 2 min",
-          how:"Log the ASSISTANCE weight — lower is stronger. Full hang, chin over the bar, lower slowly (3 s). Hit 3×8 and drop the assist by 2.5–5kg." },
+          how:"Log the ASSISTANCE weight — lower is stronger. Full hang, chin over the bar, lower slowly (3 s). Hit 3×8 and drop the assist by 2.5–5kg.",
+          alternatives:["Band-assisted Pull-up","Negative Pull-up","Lat Pulldown"] },
         { key:"dbbench", name:"DB Bench Press", type:"weights", target:"3 × 8–10", sets:3, topReps:10, startKg:7, stepKg:1, rest:"Rest 90 s",
-          how:"kg is per dumbbell. Shoulder blades squeezed back and down, lower to chest level, press up and slightly together." },
+          how:"kg is per dumbbell. Shoulder blades squeezed back and down, lower to chest level, press up and slightly together.",
+          alternatives:["Barbell Bench Press","Machine Chest Press","Push-up"] },
         { key:"row", name:"Seated Cable Row", type:"weights", target:"3 × 10–12", sets:3, topReps:12, startKg:25, stepKg:2.5, rest:"Rest 90 s",
-          how:"Chest up, pull the handle to your belly button, squeeze the shoulder blades, slow return." },
+          how:"Chest up, pull the handle to your belly button, squeeze the shoulder blades, slow return.",
+          alternatives:["Chest-supported Row","Machine Row","1-Arm DB Row"] },
         { key:"ohp", name:"DB Shoulder Press", type:"weights", target:"3 × 8–10", sets:3, topReps:10, startKg:6, stepKg:1, rest:"Rest 90 s",
-          how:"Seated with your back supported. Press up without arching your lower back." },
+          how:"Seated with your back supported. Press up without arching your lower back.",
+          alternatives:["Machine Shoulder Press","Arnold Press","Landmine Press"] },
         { key:"curl", name:"DB Bicep Curl", type:"weights", target:"3 × 10–12", sets:3, topReps:12, startKg:6, stepKg:1, rest:"Superset with pushdowns",
-          how:"Straight into the tricep pushdowns, then rest 60 s. Elbows pinned to your sides, no swinging, 2–3 s lowering." },
+          how:"Straight into the tricep pushdowns, then rest 60 s. Elbows pinned to your sides, no swinging, 2–3 s lowering.",
+          alternatives:["Hammer Curl","Cable Curl","EZ-bar Curl"] },
         { key:"tricep", name:"Tricep Rope Pushdown", type:"weights", target:"3 × 10–12", sets:3, topReps:12, startKg:10, stepKg:2.5, rest:"Rest 60 s",
-          how:"Elbows tucked at your sides, spread the rope apart at the bottom." },
+          how:"Elbows tucked at your sides, spread the rope apart at the bottom.",
+          alternatives:["Overhead Cable Extension","Skull Crusher","Dip Machine"] },
         { key:"plank", name:"Plank", type:"bodyweight", unit:"Secs", target:"3 × 30–60 s", sets:3, topReps:60, rest:"Abs circuit · rest 30 s",
           how:"Three rounds: plank → knee raise → side plank. Squeeze your glutes, ribs down, straight line head to heels." },
         { key:"kneeraise", name:"Hanging Knee Raise", type:"bodyweight", target:"3 × 8–15", sets:3, topReps:15, rest:"Rest 30 s",
@@ -144,19 +158,25 @@ window.GYM_PLAN = {
       mobility: { time:"2 min",   how:"10 hip hinges (hands on hips, no weight) + 10 glute bridges + 10 arm circles each way." },
       exercises: [
         { key:"deadlift", name:"Deadlift", type:"weights", target:"4 × 5–6", sets:4, topReps:6, startKg:50, stepKg:2.5, rest:"Rest 2–3 min", tile:true,
-          how:"Warm-up sets: 30kg ×5, 40kg ×3. Bar over mid-foot, flat back, push the floor away, finish by squeezing your glutes. Reset each rep." },
+          how:"Warm-up sets: 30kg ×5, 40kg ×3. Bar over mid-foot, flat back, push the floor away, finish by squeezing your glutes. Reset each rep.",
+          alternatives:["Trap-bar Deadlift","Rack Pull","Romanian Deadlift"] },
         { key:"pulldown", name:"Lat Pulldown", type:"weights", target:"3 × 8–10", sets:3, topReps:10, startKg:30, stepKg:2.5, rest:"Rest 90 s",
-          how:"Pull the bar to your upper chest, elbows down and back, no leaning back. Your key pull-up builder." },
+          how:"Pull the bar to your upper chest, elbows down and back, no leaning back. Your key pull-up builder.",
+          alternatives:["Assisted Pull-up","Straight-arm Pulldown","Chest-supported Row"] },
         { key:"incline", name:"Incline DB Press", type:"weights", target:"3 × 8–10", sets:3, topReps:10, startKg:6, stepKg:1, rest:"Rest 90 s",
-          how:"Bench at about 30°. kg is per dumbbell." },
+          how:"Bench at about 30°. kg is per dumbbell.",
+          alternatives:["Incline Barbell Press","Machine Incline Press","Push-up"] },
         { key:"bss", name:"Bulgarian Split Squat", type:"weights", target:"3 × 8–10 each leg", sets:3, topReps:10, startKg:6, stepKg:1, rest:"Rest 90 s",
-          how:"Rear foot on a bench, most of the weight on the front leg, drop straight down. Log reps per leg." },
+          how:"Rear foot on a bench, most of the weight on the front leg, drop straight down. Log reps per leg.",
+          alternatives:["Reverse Lunge","Step-up","Leg Press"] },
         { key:"dbrow", name:"1-Arm DB Row", type:"weights", target:"3 × 10–12 each arm", sets:3, topReps:12, startKg:10, stepKg:2, rest:"Rest 60 s",
-          how:"Hand and knee on the bench, pull the dumbbell to your hip, don't twist." },
+          how:"Hand and knee on the bench, pull the dumbbell to your hip, don't twist.",
+          alternatives:["Chest-supported Row","Seated Cable Row","Inverted Row"] },
         { key:"pallof", name:"Pallof Press", type:"weights", target:"3 × 10 each side", sets:3, topReps:12, startKg:5, stepKg:2.5, rest:"Core · rest 45 s",
           how:"Stand side-on to a cable at chest height, press the handle straight out, hold 2 s, resist being twisted." }
       ],
-      finisher:  { time:"10 min", how:"Rower intervals — 1 min hard / 1 min easy × 5." },
+      finisher:  { time:"10 min", how:"Rower intervals — 1 min hard / 1 min easy × 5.",
+          alternatives:["Cable Woodchop","Suitcase Carry","Side Plank"] },
       stretches: [
         { name:"Standing hamstring stretch", how:"Heel on a low box, leg straight, hinge forward with a flat back." },
         { name:"Kneeling hip-flexor stretch", how:"Lunge position, tuck the pelvis, push your hips forward." },
